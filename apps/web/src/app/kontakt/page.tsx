@@ -1,38 +1,11 @@
 import type { Metadata } from "next";
-import { ContactCta } from "@/components/site-shell";
-import { projectFacts } from "@/data/apartments";
+import { Mail, MapPin, Phone } from "lucide-react";
+import { ContactForm } from "@/components/contact-form";
+import { SectionHeading } from "@/components/section-heading";
+import { site } from "@/lib/site";
 
-export const metadata: Metadata = { title: "kontakt" };
+export const metadata: Metadata = { title: "Kontakt", description: "Kontaktirajte Forest Glade prodajni tim za prezentaciju i dostupnost apartmana." };
 
-export default function Page() {
-  const title = {
-    projekat: "Projekat",
-    "virtuelne-setnje": "Virtuelne šetnje",
-    lokacija: "Lokacija",
-    galerija: "Galerija",
-    kontakt: "Kontakt",
-  }["kontakt"];
-
-  return (
-    <main>
-      <section className="bg-stone-100">
-        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-          <p className="text-sm uppercase tracking-[0.35em] text-forest-700">Forest Glade</p>
-          <h1 className="mt-3 text-5xl font-semibold text-forest-950">{title}</h1>
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-stone-600">
-            {projectFacts.category}, {projectFacts.location}. Objekat ima {projectFacts.totalApartments} apartman, spratnost {projectFacts.floors}, bruto površinu {projectFacts.grossArea} i tržišnu površinu {projectFacts.marketArea}.
-          </p>
-        </div>
-      </section>
-      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <div className="rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm">
-          <h2 className="text-3xl font-semibold text-forest-950">Premium prezentacija za prodaju</h2>
-          <p className="mt-4 max-w-4xl leading-8 text-stone-600">
-            Ova sekcija je pripremljena za render galerije, osnove, 3D ture, lokacijske prednosti, materijale i kontakt tok prodajnog tima. Sadržaj je strukturiran tako da se kasnije poveže sa Render backend-om i PostgreSQL bazom.
-          </p>
-        </div>
-      </section>
-      <ContactCta />
-    </main>
-  );
+export default function KontaktPage() {
+  return <main className="bg-ivory-100"><section className="bg-forest-950 px-5 py-20 text-white lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeading light eyebrow="Kontakt" title="Zakažite prezentaciju Forest Glade Apart Hotela" description="Za tačan termin prezentacije i dostupnost apartmana kontaktirajte prodajni tim." /></div></section><section className="mx-auto grid max-w-7xl gap-8 px-5 py-16 lg:grid-cols-[.9fr_1.1fr] lg:px-8"><div className="space-y-5"><div className="rounded-[2rem] bg-white p-7 shadow-sm"><Mail className="text-gold-500" /><h2 className="mt-4 text-2xl font-semibold">Email</h2><p className="mt-2 text-stone-600">{site.email}</p></div><div className="rounded-[2rem] bg-white p-7 shadow-sm"><Phone className="text-gold-500" /><h2 className="mt-4 text-2xl font-semibold">Telefon</h2><p className="mt-2 text-stone-600">Telefon: {site.phone}</p></div><div className="rounded-[2rem] bg-white p-7 shadow-sm"><MapPin className="text-gold-500" /><h2 className="mt-4 text-2xl font-semibold">Lokacija</h2><p className="mt-2 text-stone-600">{site.location}</p></div><div className="rounded-[2rem] border border-gold-300/40 bg-forest-900 p-8 text-white"><p className="text-sm uppercase tracking-[0.3em] text-gold-300">Mapa</p><p className="mt-8 text-3xl font-semibold">Velika Međa bb, Vrdnik</p></div></div><ContactForm /></section></main>;
 }
