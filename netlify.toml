@@ -1,0 +1,7 @@
+[build]
+  base = "."
+  command = "npm ci --include=dev && npm --workspace apps/web run build"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NETLIFY_NEXT_SKEW_PROTECTION = "true"
