@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-forest-950: #0b1f18;
+  --color-forest-900: #102c22;
+  --color-forest-800: #173d30;
+  --color-forest-700: #205641;
+  --color-gold-300: #d9bd82;
+  --color-gold-200: #ead8ad;
+}
+
+body { font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif; }
+::selection { background: #d9bd82; color: #0b1f18; }
