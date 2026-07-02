@@ -5,34 +5,36 @@ export type Apartment = {
   code: string;
   slug: string;
   floor: "Prizemlje" | "I sprat" | "II sprat" | "Povučeni sprat";
-  type: "Studio" | "Dvosoban" | "Trosoban";
-  marketArea: number | null;
+  type: "Apartman";
+  marketArea: number;
   status: ApartmentStatus;
 };
 
-const floors = [
-  { floor: "Prizemlje", from: 1, to: 7 },
-  { floor: "I sprat", from: 8, to: 16 },
-  { floor: "II sprat", from: 17, to: 25 },
-  { floor: "Povučeni sprat", from: 26, to: 31 },
+const apartmentAreas = [
+  51.69, 29.92, 33.34, 43.36, 37.16, 46.12, 53.17, 32.54, 34.67, 29.91, 32.18, 54.75, 38.24, 53.34, 33.35, 33.49,
+  32.54, 34.67, 29.91, 32.18, 54.75, 38.24, 53.34, 33.35, 33.49, 71.76, 51.62, 60.61, 70.41, 63.2, 55.37,
 ] as const;
 
-export const apartments: Apartment[] = floors.flatMap(({ floor, from, to }) =>
-  Array.from({ length: to - from + 1 }, (_, index) => {
-    const id = from + index;
-    const type = id % 5 === 0 ? "Trosoban" : id % 2 === 0 ? "Dvosoban" : "Studio";
+function getFloor(id: number): Apartment["floor"] {
+  if (id <= 7) return "Prizemlje";
+  if (id <= 16) return "I sprat";
+  if (id <= 25) return "II sprat";
+  return "Povučeni sprat";
+}
 
-    return {
-      id,
-      code: `A${id}`,
-      slug: `a${id}`,
-      floor,
-      type,
-      marketArea: null,
-      status: "available",
-    } satisfies Apartment;
-  }),
-);
+export const apartments: Apartment[] = apartmentAreas.map((marketArea, index) => {
+  const id = index + 1;
+
+  return {
+    id,
+    code: `A${id}`,
+    slug: `a${id}`,
+    floor: getFloor(id),
+    type: "Apartman",
+    marketArea,
+    status: "available",
+  } satisfies Apartment;
+});
 
 export const projectFacts = {
   name: "Forest Glade",

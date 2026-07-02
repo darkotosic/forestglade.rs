@@ -7,6 +7,7 @@ import { env } from "./env.js";
 import { prisma } from "./prisma.js";
 
 const app = express();
+app.set("trust proxy", 1);
 const allowedOrigins = new Set(["http://localhost:3000", ...env.corsOrigins]);
 
 app.use(helmet());
@@ -37,6 +38,11 @@ app.get("/api/leads", async (req, res) => {
   if (!env.leadsApiKey || req.header("x-api-key") !== env.leadsApiKey) return res.status(401).json({ ok: false, message: "Unauthorized" });
   const leads = await prisma.lead.findMany({ orderBy: { createdAt: "desc" }, take: 100 });
   return res.json({ ok: true, leads });
+});
+
+app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error(err);
+  return res.status(500).json({ ok: false, message: "Internal server error" });
 });
 
 app.listen(env.port, () => console.log(`forestglade-api listening on ${env.port}`));
