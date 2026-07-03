@@ -4,6 +4,8 @@ import { projectFacts } from "@/data/apartments";
 
 export const metadata: Metadata = { title: "galerija" };
 
+import { PublicGallery } from "@/components/public/public-live";
+
 export default function Page() {
   const title = {
     projekat: "Projekat",
@@ -33,6 +35,6 @@ export default function Page() {
         </div>
       </section>
       <ContactCta />
-    </main>
+    <PublicGallery /></main>
   );
 }

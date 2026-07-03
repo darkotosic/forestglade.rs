@@ -7,13 +7,179 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AdminRole {
+  OWNER
+  ADMIN
+  SALES
+  EDITOR
+}
+enum ApartmentStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  HIDDEN
+}
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  FLOOR_PLAN
+  RENDER
+  VIRTUAL_TOUR
+}
+enum MediaPlacement {
+  HOME_HERO
+  PROJECT_GALLERY
+  APARTMENT_GALLERY
+  APARTMENT_PLAN
+  FLOOR_PLAN
+  EXTERIOR
+  INTERIOR
+  VIRTUAL_TOUR
+  DOCUMENTATION
+}
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  NOT_INTERESTED
+  CLOSED
+  ARCHIVED
+}
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  CREATE
+  UPDATE
+  DELETE
+  ARCHIVE
+  UPLOAD
+  PUBLISH
+  UNPUBLISH
+}
+
 model Lead {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   name         String
   phone        String
   email        String?
   message      String?
   interestedIn String?
-  source       String   @default("website")
-  createdAt    DateTime @default(now())
+  source       String     @default("website")
+  status       LeadStatus @default(NEW)
+  note         String?
+  assignedToId String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AdminUser {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  name         String
+  passwordHash String
+  role         AdminRole      @default(EDITOR)
+  isActive     Boolean        @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  sessions     AdminSession[]
+  media        MediaAsset[]
+  auditLogs    AuditLog[]
+}
+
+model AdminSession {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  adminId   String
+  admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([adminId])
+  @@index([expiresAt])
+}
+
+model Apartment {
+  id               String          @id @default(cuid())
+  code             String          @unique
+  slug             String          @unique
+  floor            String
+  officialType     String
+  marketArea       Decimal         @db.Decimal(8, 2)
+  status           ApartmentStatus @default(AVAILABLE)
+  price            Decimal?        @db.Decimal(12, 2)
+  priceNote        String?
+  shortDescription String?
+  description      String?
+  seoTitle         String?
+  seoDescription   String?
+  isPublished      Boolean         @default(true)
+  sourceLocked     Boolean         @default(true)
+  sortOrder        Int             @default(0)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  media            MediaAsset[]
+}
+
+model MediaAsset {
+  id                 String         @id @default(cuid())
+  type               MediaType
+  placement          MediaPlacement
+  title              String
+  alt                String?
+  caption            String?
+  apartmentId        String?
+  apartment          Apartment?     @relation(fields: [apartmentId], references: [id], onDelete: SetNull)
+  cloudinaryPublicId String
+  secureUrl          String
+  thumbnailUrl       String?
+  format             String?
+  width              Int?
+  height             Int?
+  durationSeconds    Int?
+  bytes              Int?
+  sortOrder          Int            @default(0)
+  isPublished        Boolean        @default(false)
+  createdById        String?
+  createdBy          AdminUser?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@index([apartmentId])
+  @@index([placement])
+  @@index([isPublished])
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  adminId    String?
+  admin      AdminUser?  @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  action     AuditAction
+  entity     String
+  entityId   String?
+  message    String?
+  beforeJson Json?
+  afterJson  Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime    @default(now())
+
+  @@index([adminId])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 }

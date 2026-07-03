@@ -1,19 +1,23 @@
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { z } from "zod";
 import { env } from "./env.js";
 import { prisma } from "./prisma.js";
+import { adminRouter } from "./admin-routes.js";
+import { publicRouter } from "./public-routes.js";
 
 const app = express();
 app.set("trust proxy", 1);
 const allowedOrigins = new Set(["http://localhost:3000", ...env.corsOrigins]);
 
 app.use(helmet());
-app.use(express.json({ limit: "32kb" }));
+app.use(express.json({ limit: "1mb" }));
+app.use(cookieParser());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 100 }));
-app.use(cors({ origin(origin, callback) { if (!origin || allowedOrigins.has(origin)) return callback(null, true); return callback(new Error("Origin not allowed by CORS")); } }));
+app.use(cors({ credentials: true, origin(origin, callback) { if (!origin || allowedOrigins.has(origin)) return callback(null, true); return callback(new Error("Origin not allowed by CORS")); } }));
 
 const leadSchema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -33,6 +37,9 @@ app.post("/api/leads", async (req, res) => {
   const lead = await prisma.lead.create({ data: { ...data, email: email || undefined } });
   return res.status(201).json({ ok: true, leadId: lead.id });
 });
+
+app.use("/api/admin", adminRouter);
+app.use("/api/public", publicRouter);
 
 app.get("/api/leads", async (req, res) => {
   if (!env.leadsApiKey || req.header("x-api-key") !== env.leadsApiKey) return res.status(401).json({ ok: false, message: "Unauthorized" });
