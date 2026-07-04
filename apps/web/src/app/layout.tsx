@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Footer, Header } from "@/components/site-shell";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -11,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="sr"><body className="min-h-screen antialiased"><Header />{children}<Footer /></body></html>;
+  return <html lang="sr"><body className="min-h-screen antialiased">{children}</body></html>;
 }

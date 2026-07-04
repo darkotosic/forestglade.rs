@@ -1,3 +1,11 @@
-import { ApartmentAdminClient } from "./apartment-admin-client";
-export function generateStaticParams(){return Array.from({length:31},(_,i)=>({slug:`a${i+1}`}))}
-export default async function Page({params}:{params:Promise<{slug:string}>}){const {slug}=await params; return <ApartmentAdminClient slug={slug}/>}
+import { OFFICIAL_APARTMENTS } from "@forestglade/project-data";
+import { ApartmentEditPage } from "@/components/admin/apartment-edit-page";
+
+export function generateStaticParams() {
+  return OFFICIAL_APARTMENTS.map((apartment) => ({ slug: apartment.slug }));
+}
+
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  return <ApartmentEditPage slug={slug} />;
+}

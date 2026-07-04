@@ -23,9 +23,9 @@ export function Footer() {
   return (
     <footer className="bg-forest-950 text-mist-100">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.2fr_.7fr_1fr] lg:px-8">
-        <div><p className="text-2xl font-semibold text-white">FOREST GLADE</p><p className="mt-4 max-w-md leading-7 text-mist-200">Forest Glade d.o.o razvija savremeni apart-hotel koncept u Vrdniku, sa fokusom na kvalitet gradnje, funkcionalne apartmane i poverenje kupaca.</p><p className="mt-4 text-sm text-mist-300">Telefon je placeholder dok klijent ne potvrdi zvaničan broj.</p></div>
+        <div><p className="text-2xl font-semibold text-white">FOREST GLADE</p><p className="mt-4 max-w-md leading-7 text-mist-200">Forest Glade d.o.o razvija savremeni apart-hotel koncept u Vrdniku, sa fokusom na kvalitet gradnje, funkcionalne apartmane i poverenje kupaca.</p><p className="mt-4 text-sm text-mist-300">Zvaničan telefon: POTREBNA PROVERA.</p></div>
         <div><p className="font-semibold text-white">Linkovi</p><div className="mt-4 grid gap-3 text-sm">{navigation.map((item) => <Link key={item.href} href={item.href} className="hover:text-gold-300">{item.label}</Link>)}</div></div>
-        <div><p className="font-semibold text-white">Kontakt</p><div className="mt-4 space-y-3 text-sm"><p className="flex gap-3"><Mail size={18} className="text-gold-300" /> {site.email}</p><p className="flex gap-3"><MapPin size={18} className="text-gold-300" /> {site.location}</p><p className="flex gap-3"><Phone size={18} className="text-gold-300" /> Telefon: {site.phone}</p></div></div>
+        <div><p className="font-semibold text-white">Kontakt</p><div className="mt-4 space-y-3 text-sm"><p className="flex gap-3"><Mail size={18} className="text-gold-300" /> {site.email}</p><p className="flex gap-3"><MapPin size={18} className="text-gold-300" /> {site.location}</p>{site.phone !== "POTREBNA PROVERA" ? <p className="flex gap-3"><Phone size={18} className="text-gold-300" /> Telefon: {site.phone}</p> : <p className="flex gap-3"><Phone size={18} className="text-gold-300" /> Telefon: POTREBNA PROVERA</p>}</div></div>
       </div>
     </footer>
   );
