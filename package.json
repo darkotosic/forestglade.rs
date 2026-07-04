@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "workspaces": [
     "apps/web",
-    "apps/api"
+    "apps/api",
+    "packages/*"
   ],
   "scripts": {
     "dev:web": "npm --workspace apps/web run dev",
