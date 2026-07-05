@@ -24,7 +24,6 @@ export default function Home() {
           <h1 className="max-w-4xl text-5xl font-semibold tracking-tight md:text-7xl">Forest Glade Apart Hotel</h1>
           <p className="mt-6 max-w-2xl text-xl leading-8 text-mist-100">Premium apartmani u Vrdniku, na obroncima Fruške Gore — prezentovani kroz jasne podatke, sigurnu komunikaciju i iskustvo kupovine dostojno investicionog proizvoda.</p>
           <div className="mt-8 flex flex-col gap-4 sm:flex-row"><Link href="/projekti" className="rounded-full bg-gold-300 px-7 py-4 text-center font-semibold text-forest-950 shadow-xl shadow-gold-300/20 transition hover:-translate-y-0.5 hover:bg-white">Pogledaj projekte</Link><Link href="/kontakt" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 font-semibold backdrop-blur transition hover:-translate-y-0.5 hover:border-gold-300 hover:text-gold-300">Kontaktirajte nas <ArrowRight size={18}/></Link></div>
-          <div className="mt-10 grid max-w-2xl gap-3 sm:grid-cols-3">{journey.map((item, index) => <div key={item} className="rounded-2xl border border-white/10 bg-white/[.07] p-4 backdrop-blur"><span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-300">0{index + 1}</span><p className="mt-2 text-sm leading-6 text-mist-100">{item}</p></div>)}</div>
         </div>
         <div className="rounded-[2.5rem] border border-white/15 bg-white/10 p-4 shadow-2xl shadow-black/30 backdrop-blur-xl">
           <div className="rounded-[2rem] bg-ivory-100 p-5 text-forest-950">
