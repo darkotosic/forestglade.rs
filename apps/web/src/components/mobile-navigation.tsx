@@ -52,6 +52,40 @@ const defaultNavigationEnhancement = {
   icon: Sparkles,
 };
 
+const focusableMenuSelector = "a[href], button:not([disabled])";
+
+function lockDocumentScroll() {
+  const scrollY = window.scrollY;
+  const previousBodyStyles = {
+    overflow: document.body.style.overflow,
+    position: document.body.style.position,
+    top: document.body.style.top,
+    left: document.body.style.left,
+    right: document.body.style.right,
+    width: document.body.style.width,
+  };
+  const previousHtmlOverscrollBehavior = document.documentElement.style.overscrollBehavior;
+
+  document.documentElement.style.overscrollBehavior = "none";
+  document.body.style.overflow = "hidden";
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+
+  return () => {
+    document.documentElement.style.overscrollBehavior = previousHtmlOverscrollBehavior;
+    document.body.style.overflow = previousBodyStyles.overflow;
+    document.body.style.position = previousBodyStyles.position;
+    document.body.style.top = previousBodyStyles.top;
+    document.body.style.left = previousBodyStyles.left;
+    document.body.style.right = previousBodyStyles.right;
+    document.body.style.width = previousBodyStyles.width;
+    window.scrollTo(0, scrollY);
+  };
+}
+
 export function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -71,16 +105,8 @@ export function MobileNavigation() {
       return;
     }
 
-    const previousOverflow = document.body.style.overflow;
-    const previousPaddingRight = document.body.style.paddingRight;
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-
-    document.body.style.overflow = "hidden";
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
-    }
-
-    window.setTimeout(() => closeButtonRef.current?.focus(), 50);
+    const unlockDocumentScroll = lockDocumentScroll();
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus(), 50);
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -94,7 +120,7 @@ export function MobileNavigation() {
       }
 
       const focusableElements = document.querySelectorAll<HTMLElement>(
-        `#${CSS.escape(panelId)} a[href], #${CSS.escape(panelId)} button:not([disabled])`,
+        `#${CSS.escape(panelId)} ${focusableMenuSelector}`,
       );
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
@@ -115,8 +141,8 @@ export function MobileNavigation() {
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
-      document.body.style.paddingRight = previousPaddingRight;
+      window.clearTimeout(focusTimer);
+      unlockDocumentScroll();
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [closeMenu, isOpen, panelId]);
@@ -138,7 +164,7 @@ export function MobileNavigation() {
 
       <div
         aria-hidden="true"
-        className={`fixed inset-0 z-[60] bg-forest-950/85 backdrop-blur-md transition-opacity duration-300 ${isOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[60] touch-none bg-forest-950/85 backdrop-blur-md transition-opacity duration-300 ${isOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
         onClick={closeMenu}
       />
 
@@ -147,7 +173,7 @@ export function MobileNavigation() {
         aria-label="Glavni meni"
         aria-modal="true"
         role="dialog"
-        className={`fixed inset-y-0 right-0 z-[70] flex h-dvh w-full max-w-[28rem] flex-col overflow-hidden border-l border-white/10 bg-forest-950 text-white shadow-2xl transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed inset-y-0 right-0 z-[70] flex h-dvh w-full max-w-[28rem] transform-gpu flex-col overflow-hidden overscroll-contain border-l border-white/10 bg-forest-950 text-white shadow-2xl transition-transform duration-300 ease-out will-change-transform ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         <div className="relative overflow-hidden border-b border-white/10 px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(201,162,39,0.22),transparent_34rem)]" aria-hidden="true" />
@@ -176,7 +202,7 @@ export function MobileNavigation() {
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-4 py-5" aria-label="Mobilna navigacija">
+        <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-5" aria-label="Mobilna navigacija">
           <div className="grid gap-2">
             {navigation.map((item) => {
               const isActive = item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
