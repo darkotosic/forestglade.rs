@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Leaf, Mail, MapPin, Phone } from "lucide-react";
 import { navigation, site } from "@/lib/site";
+import { MobileNavigation } from "@/components/mobile-navigation";
 
 export function Header() {
   return (
@@ -13,7 +14,8 @@ export function Header() {
         <nav className="hidden items-center gap-7 text-sm font-medium text-mist-100 lg:flex">
           {navigation.map((item) => <Link key={item.href} href={item.href} className="transition hover:text-gold-300">{item.label}</Link>)}
         </nav>
-        <Link href="/kontakt" className="rounded-full bg-gold-300 px-5 py-3 text-sm font-semibold text-forest-950 transition hover:bg-white">Zakažite prezentaciju</Link>
+        <Link href="/kontakt" className="hidden rounded-full bg-gold-300 px-5 py-3 text-sm font-semibold text-forest-950 transition hover:bg-white sm:inline-flex">Zakažite prezentaciju</Link>
+        <MobileNavigation />
       </div>
     </header>
   );
