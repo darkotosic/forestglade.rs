@@ -96,9 +96,16 @@ export function MobileNavigation() {
   const closeMenu = useCallback(() => setIsOpen(false), []);
   const openMenu = useCallback(() => setIsOpen(true), []);
 
-  const activeSection = useMemo(() => {
-    return navigation.find((item) => (item.href === "/" ? pathname === item.href : pathname.startsWith(item.href))) ?? navigation[0];
+  const activeSectionIndex = useMemo(() => {
+    const index = navigation.findIndex((item) => (item.href === "/" ? pathname === item.href : pathname.startsWith(item.href)));
+
+    return index >= 0 ? index : 0;
   }, [pathname]);
+
+  const activeSection = navigation[activeSectionIndex] ?? navigation[0];
+  const activeSectionNumber = activeSectionIndex + 1;
+  const navigationTotal = navigation.length;
+  const activeProgress = `${(activeSectionNumber / navigationTotal) * 100}%`;
 
   useEffect(() => {
     if (!isOpen) {
@@ -196,15 +203,30 @@ export function MobileNavigation() {
             </button>
           </div>
 
-          <div className="relative mt-5 rounded-2xl border border-gold-300/25 bg-white/[0.06] p-4">
-            <p className="text-xs uppercase tracking-[0.25em] text-mist-300">Trenutno otvoreno</p>
-            <p className="mt-1 font-semibold text-gold-300">{activeSection.label}</p>
+          <div className="relative mt-5 overflow-hidden rounded-2xl border border-gold-300/25 bg-white/[0.06] p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.25em] text-mist-300">Trenutno otvoreno</p>
+                <p className="mt-1 font-semibold text-gold-300">{activeSection.label}</p>
+              </div>
+              <p className="rounded-full border border-gold-300/30 bg-forest-950/40 px-3 py-1 text-sm font-semibold tabular-nums text-gold-300 transition-colors duration-300" aria-label={`Stavka ${activeSectionNumber} od ${navigationTotal}`}>
+                {String(activeSectionNumber).padStart(2, "0")}
+                <span className="mx-1 text-mist-400">/</span>
+                {String(navigationTotal).padStart(2, "0")}
+              </p>
+            </div>
+            <div className="mt-4 h-1 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+              <div
+                className="h-full rounded-full bg-gold-300 transition-[width] duration-500 ease-out"
+                style={{ width: activeProgress }}
+              />
+            </div>
           </div>
         </div>
 
         <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-5" aria-label="Mobilna navigacija">
           <div className="grid gap-2">
-            {navigation.map((item) => {
+            {navigation.map((item, index) => {
               const isActive = item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
               const enhancement = navigationEnhancements[item.href as keyof typeof navigationEnhancements] ?? defaultNavigationEnhancement;
               const Icon = enhancement.icon;
@@ -224,7 +246,9 @@ export function MobileNavigation() {
                     <span className="block text-base font-semibold">{item.label}</span>
                     <span className={`mt-0.5 block text-sm leading-5 ${isActive ? "text-forest-900/80" : "text-mist-300"}`}>{enhancement.description}</span>
                   </span>
-                  <ArrowRight aria-hidden="true" className="transition group-hover:translate-x-0.5" size={18} />
+                  <span className={`text-xs font-semibold tabular-nums transition-colors duration-300 ${isActive ? "text-forest-900/70" : "text-mist-400 group-hover:text-gold-300"}`}>
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
                 </Link>
               );
             })}
