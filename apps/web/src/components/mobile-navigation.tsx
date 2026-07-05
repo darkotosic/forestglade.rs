@@ -2,15 +2,69 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
-import { navigation } from "@/lib/site";
+import {
+  ArrowRight,
+  Building2,
+  Camera,
+  Home,
+  Info,
+  LayoutGrid,
+  Mail,
+  MapPin,
+  Menu,
+  Phone,
+  ShieldCheck,
+  Sparkles,
+  X,
+} from "lucide-react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { navigation, site } from "@/lib/site";
+
+const navigationEnhancements = {
+  "/": {
+    description: "Pregled projekta i ključnih prednosti",
+    icon: Home,
+  },
+  "/projekti": {
+    description: "Razvojni koncept i investicioni okvir",
+    icon: Building2,
+  },
+  "/apartmani": {
+    description: "Dostupne jedinice, strukture i površine",
+    icon: LayoutGrid,
+  },
+  "/galerija": {
+    description: "Renderi, vizuelni identitet i atmosfera",
+    icon: Camera,
+  },
+  "/o-nama": {
+    description: "Tim, standardi i vrednosti kompanije",
+    icon: Info,
+  },
+  "/kontakt": {
+    description: "Prodajni upit i zakazivanje prezentacije",
+    icon: Mail,
+  },
+} as const;
+
+const defaultNavigationEnhancement = {
+  description: "Saznajte više o Forest Glade ponudi",
+  icon: Sparkles,
+};
 
 export function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const panelId = useId();
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  const closeMenu = useCallback(() => setIsOpen(false), []);
+  const openMenu = useCallback(() => setIsOpen(true), []);
+
+  const activeSection = useMemo(() => {
+    return navigation.find((item) => (item.href === "/" ? pathname === item.href : pathname.startsWith(item.href))) ?? navigation[0];
+  }, [pathname]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -18,33 +72,43 @@ export function MobileNavigation() {
     }
 
     const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
     document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    window.setTimeout(() => closeButtonRef.current?.focus(), 50);
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsOpen(false);
+        closeMenu();
+        menuButtonRef.current?.focus();
         return;
       }
 
-      if (event.key === "Tab") {
-        const focusableElements = document.querySelectorAll<HTMLElement>(
-          `#${CSS.escape(panelId)} a[href], #${CSS.escape(panelId)} button:not([disabled])`,
-        );
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
+      if (event.key !== "Tab") {
+        return;
+      }
 
-        if (!firstElement || !lastElement) {
-          return;
-        }
+      const focusableElements = document.querySelectorAll<HTMLElement>(
+        `#${CSS.escape(panelId)} a[href], #${CSS.escape(panelId)} button:not([disabled])`,
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
 
-        if (event.shiftKey && document.activeElement === firstElement) {
-          event.preventDefault();
-          lastElement.focus();
-        } else if (!event.shiftKey && document.activeElement === lastElement) {
-          event.preventDefault();
-          firstElement.focus();
-        }
+      if (!firstElement || !lastElement) {
+        return;
+      }
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
       }
     };
 
@@ -52,76 +116,122 @@ export function MobileNavigation() {
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [isOpen, panelId]);
+  }, [closeMenu, isOpen, panelId]);
 
   return (
     <div className="lg:hidden">
       <button
+        ref={menuButtonRef}
         type="button"
         aria-controls={panelId}
         aria-expanded={isOpen}
         aria-label="Otvori glavni meni"
-        onClick={() => setIsOpen(true)}
-        className="inline-flex size-12 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white shadow-lg shadow-black/10 transition hover:border-gold-300 hover:text-gold-300 focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950"
+        onClick={openMenu}
+        className="group inline-flex h-12 items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 text-white shadow-lg shadow-black/10 transition hover:border-gold-300 hover:bg-white/15 hover:text-gold-300 focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950"
       >
         <Menu aria-hidden="true" size={23} />
+        <span className="hidden text-sm font-semibold sm:inline">Meni</span>
       </button>
 
       <div
-        aria-hidden={!isOpen}
-        className={`fixed inset-0 z-[60] bg-forest-950/80 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
-        onClick={() => setIsOpen(false)}
+        aria-hidden="true"
+        className={`fixed inset-0 z-[60] bg-forest-950/85 backdrop-blur-md transition-opacity duration-300 ${isOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        onClick={closeMenu}
       />
 
       <aside
         id={panelId}
         aria-label="Glavni meni"
-        className={`fixed right-0 top-0 z-[70] flex h-dvh w-full max-w-sm flex-col border-l border-white/10 bg-forest-950 px-6 py-5 text-white shadow-2xl transition-transform duration-300 ease-out sm:max-w-md ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+        aria-modal="true"
+        role="dialog"
+        className={`fixed inset-y-0 right-0 z-[70] flex h-dvh w-full max-w-[28rem] flex-col overflow-hidden border-l border-white/10 bg-forest-950 text-white shadow-2xl transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-gold-300">Navigacija</p>
-            <p className="mt-1 text-lg font-semibold">Forest Glade</p>
+        <div className="relative overflow-hidden border-b border-white/10 px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(201,162,39,0.22),transparent_34rem)]" aria-hidden="true" />
+          <div className="relative flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-gold-300">Navigacija</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight">Forest Glade</p>
+              <p className="mt-2 max-w-[17rem] text-sm leading-6 text-mist-200">
+                Brz pristup projektu, apartmanima i prodajnom timu.
+              </p>
+            </div>
+            <button
+              ref={closeButtonRef}
+              type="button"
+              aria-label="Zatvori glavni meni"
+              onClick={closeMenu}
+              className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition hover:border-gold-300 hover:text-gold-300 focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950"
+            >
+              <X aria-hidden="true" size={22} />
+            </button>
           </div>
-          <button
-            ref={closeButtonRef}
-            type="button"
-            aria-label="Zatvori glavni meni"
-            onClick={() => setIsOpen(false)}
-            className="inline-flex size-11 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition hover:border-gold-300 hover:text-gold-300 focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950"
-          >
-            <X aria-hidden="true" size={22} />
-          </button>
+
+          <div className="relative mt-5 rounded-2xl border border-gold-300/25 bg-white/[0.06] p-4">
+            <p className="text-xs uppercase tracking-[0.25em] text-mist-300">Trenutno otvoreno</p>
+            <p className="mt-1 font-semibold text-gold-300">{activeSection.label}</p>
+          </div>
         </div>
 
-        <nav className="mt-10 grid gap-3" aria-label="Mobilna navigacija">
-          {navigation.map((item) => {
-            const isActive = item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={isActive ? "page" : undefined}
-                onClick={() => setIsOpen(false)}
-                className={`rounded-2xl border px-5 py-4 text-lg font-semibold transition focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950 ${isActive ? "border-gold-300 bg-gold-300 text-forest-950" : "border-white/10 bg-white/[0.04] text-mist-100 hover:border-gold-300 hover:text-gold-300"}`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 overflow-y-auto px-4 py-5" aria-label="Mobilna navigacija">
+          <div className="grid gap-2">
+            {navigation.map((item) => {
+              const isActive = item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
+              const enhancement = navigationEnhancements[item.href as keyof typeof navigationEnhancements] ?? defaultNavigationEnhancement;
+              const Icon = enhancement.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={closeMenu}
+                  className={`group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border p-3.5 transition focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950 ${isActive ? "border-gold-300 bg-gold-300 text-forest-950 shadow-lg shadow-gold-300/10" : "border-white/10 bg-white/[0.04] text-mist-100 hover:border-gold-300/70 hover:bg-white/[0.07] hover:text-white"}`}
+                >
+                  <span className={`flex size-11 items-center justify-center rounded-xl ${isActive ? "bg-forest-950/10" : "bg-white/10 text-gold-300"}`}>
+                    <Icon aria-hidden="true" size={20} />
+                  </span>
+                  <span>
+                    <span className="block text-base font-semibold">{item.label}</span>
+                    <span className={`mt-0.5 block text-sm leading-5 ${isActive ? "text-forest-900/80" : "text-mist-300"}`}>{enhancement.description}</span>
+                  </span>
+                  <ArrowRight aria-hidden="true" className="transition group-hover:translate-x-0.5" size={18} />
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
-        <div className="mt-auto rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5">
-          <p className="text-sm uppercase tracking-[0.25em] text-mist-300">Prodaja</p>
-          <Link
-            href="/kontakt"
-            onClick={() => setIsOpen(false)}
-            className="mt-4 block rounded-full bg-gold-300 px-5 py-3 text-center font-semibold text-forest-950 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950"
-          >
-            Zakažite prezentaciju
-          </Link>
+        <div className="border-t border-white/10 bg-white/[0.03] px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5">
+          <div className="rounded-[1.5rem] border border-white/10 bg-forest-900/80 p-5 shadow-xl shadow-black/10">
+            <div className="flex items-start gap-3">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gold-300 text-forest-950">
+                <ShieldCheck aria-hidden="true" size={20} />
+              </span>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-gold-300">Prodaja</p>
+                <p className="mt-1 text-sm leading-6 text-mist-200">Zakazivanje prezentacije i provera dostupnosti apartmana.</p>
+              </div>
+            </div>
+            <Link
+              href="/kontakt"
+              onClick={closeMenu}
+              className="mt-4 flex items-center justify-center gap-2 rounded-full bg-gold-300 px-5 py-3 text-center font-semibold text-forest-950 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950"
+            >
+              Zakažite prezentaciju
+              <ArrowRight aria-hidden="true" size={18} />
+            </Link>
+            <div className="mt-4 grid gap-2 text-sm text-mist-200">
+              <p className="flex items-center gap-2"><Mail aria-hidden="true" size={16} className="text-gold-300" /> {site.email}</p>
+              <p className="flex items-center gap-2"><MapPin aria-hidden="true" size={16} className="text-gold-300" /> {site.location}</p>
+              {site.phone !== "POTREBNA PROVERA" ? (
+                <p className="flex items-center gap-2"><Phone aria-hidden="true" size={16} className="text-gold-300" /> {site.phone}</p>
+              ) : null}
+            </div>
+          </div>
         </div>
       </aside>
     </div>
