@@ -15,6 +15,7 @@ RUN npm ci --include=dev
 
 COPY . .
 
+RUN npm --workspace packages/project-data run build
 RUN npm --workspace apps/api run prisma:generate
 RUN npm --workspace apps/api run build
 

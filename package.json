@@ -15,6 +15,10 @@
     "build:api": "npm --workspace apps/api run build",
     "start:api": "npm --workspace apps/api run start",
     "prisma:generate": "npm --workspace apps/api run prisma:generate",
-    "prisma:migrate": "npm --workspace apps/api run prisma:migrate"
+    "prisma:migrate": "npm --workspace apps/api run prisma:migrate",
+    "build:project-data": "npm --workspace packages/project-data run build",
+    "typecheck:api": "npm --workspace apps/api run lint",
+    "build": "npm run build:project-data && npm run build:api && npm run build:web",
+    "check": "npm run build:project-data && npm run typecheck:api && npm run lint:web && npm run build:web"
   }
 }

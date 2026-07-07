@@ -46,6 +46,11 @@ enum LeadStatus {
   CLOSED
   ARCHIVED
 }
+enum SourceStatus {
+  VERIFIED
+  POTREBNA_PROVERA
+}
+
 enum AuditAction {
   LOGIN
   LOGOUT
@@ -70,6 +75,10 @@ model Lead {
   note         String?
   assignedToId String?
   createdAt    DateTime   @default(now())
+  consentAccepted Boolean @default(false)
+  ipAddress String?
+  userAgent String?
+  archivedAt DateTime?
   updatedAt    DateTime   @updatedAt
 
   @@index([status])
@@ -126,6 +135,23 @@ model Apartment {
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   media            MediaAsset[]
+  rooms            ApartmentRoom[]
+}
+
+model ApartmentRoom {
+  id            String       @id @default(cuid())
+  apartmentId   String
+  apartment     Apartment    @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
+  name          String
+  area          Decimal?     @db.Decimal(8, 2)
+  floorMaterial String?
+  sortOrder     Int          @default(0)
+  sourceStatus  SourceStatus @default(POTREBNA_PROVERA)
+  sourceNote    String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([apartmentId])
 }
 
 model MediaAsset {
@@ -180,6 +206,7 @@ model SiteSetting {
   id        String   @id @default(cuid())
   key       String   @unique
   value     Json
+  isPublic  Boolean  @default(false)
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 }
