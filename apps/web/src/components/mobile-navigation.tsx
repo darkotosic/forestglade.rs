@@ -3,22 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ArrowRight,
   Building2,
   Camera,
   Home,
   Info,
   LayoutGrid,
   Mail,
-  MapPin,
   Menu,
-  Phone,
-  ShieldCheck,
   Sparkles,
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { navigation, site } from "@/lib/site";
+import { navigation } from "@/lib/site";
 
 const navigationEnhancements = {
   "/": {
@@ -254,35 +250,6 @@ export function MobileNavigation() {
             })}
           </div>
         </nav>
-
-        <div className="border-t border-white/10 bg-white/[0.03] px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5">
-          <div className="rounded-[1.5rem] border border-white/10 bg-forest-900/80 p-5 shadow-xl shadow-black/10">
-            <div className="flex items-start gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gold-300 text-forest-950">
-                <ShieldCheck aria-hidden="true" size={20} />
-              </span>
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-gold-300">Prodaja</p>
-                <p className="mt-1 text-sm leading-6 text-mist-200">Zakazivanje prezentacije i provera dostupnosti apartmana.</p>
-              </div>
-            </div>
-            <Link
-              href="/kontakt"
-              onClick={closeMenu}
-              className="mt-4 flex items-center justify-center gap-2 rounded-full bg-gold-300 px-5 py-3 text-center font-semibold text-forest-950 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950"
-            >
-              Zakažite prezentaciju
-              <ArrowRight aria-hidden="true" size={18} />
-            </Link>
-            <div className="mt-4 grid gap-2 text-sm text-mist-200">
-              <p className="flex items-center gap-2"><Mail aria-hidden="true" size={16} className="text-gold-300" /> {site.email}</p>
-              <p className="flex items-center gap-2"><MapPin aria-hidden="true" size={16} className="text-gold-300" /> {site.location}</p>
-              {site.phone !== "POTREBNA PROVERA" ? (
-                <p className="flex items-center gap-2"><Phone aria-hidden="true" size={16} className="text-gold-300" /> {site.phone}</p>
-              ) : null}
-            </div>
-          </div>
-        </div>
       </aside>
     </div>
   );
