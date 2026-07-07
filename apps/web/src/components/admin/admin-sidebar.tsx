@@ -1,4 +1,4 @@
 "use client";
 import Link from "next/link"; import { useRouter } from "next/navigation"; import { adminFetch } from "@/lib/admin-api";
-const links=[["/admin","Dashboard"],["/admin/apartmani","Apartmani"],["/admin/media","Media biblioteka"],["/admin/leads","Leadovi"],["/admin/audit","Audit log"],["/admin/podesavanja","Podešavanja"]];
+const links=[["/admin","Dashboard"],["/admin/apartmani","Apartmani"],["/admin/media","Media biblioteka"],["/admin/leads","Leadovi"],["/admin/korisnici","Korisnici"],["/admin/audit","Audit log"],["/admin/podesavanja","Podešavanja"]];
 export function AdminSidebar(){const r=useRouter();return <aside className="min-h-screen bg-forest-950 p-6 text-white"><h2 className="text-xl font-semibold">Forest Glade Admin</h2><nav className="mt-8 grid gap-2">{links.map(([href,label])=><Link className="rounded-xl px-3 py-2 hover:bg-white/10" key={href} href={href}>{label}</Link>)}<button className="rounded-xl px-3 py-2 text-left hover:bg-white/10" onClick={async()=>{await adminFetch('/auth/logout',{method:'POST'});r.push('/admin/login')}}>Odjava</button></nav></aside>}

@@ -39,5 +39,11 @@ export const OFFICIAL_PROJECT_FACTS = {
 } as const;
 
 export const MATERIALIZATION_FACTS = [
-  "Materijalizacija: POTREBNA PROVERA prema PGD/PDF dokumentaciji pre javne objave detalja.",
+  "ravne linije i kubusi",
+  "demit fasada",
+  "imitacija kamena",
+  "imitacija drveta",
+  "pastelne boje",
+  "PVC stolarija sa roletnama",
+  "aluminijumski ulaz",
 ] as const;
