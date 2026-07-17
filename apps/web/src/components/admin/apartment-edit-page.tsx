@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { adminFetch } from "@/lib/admin-api";
+import { ApartmentMediaManager } from "@/components/admin/apartment-media-manager";
 
 type Apartment = {
   code: string;
@@ -88,10 +89,6 @@ export function ApartmentEditPage({ slug }: { slug: string }) {
       <label className="mt-4 flex items-center gap-3"><input type="checkbox" checked={Boolean(form.overrideOfficialFields)} onChange={(e) => setForm({ ...form, overrideOfficialFields: e.target.checked })} /> overrideOfficialFields</label>
       <label className="mt-4 grid gap-2"><span>Audit razlog</span><input className="rounded-xl border p-3" value={String(form.auditReason)} onChange={(e) => setForm({ ...form, auditReason: e.target.value })} placeholder="Obavezno za izmenu zvaničnih polja" /></label>
     </section>
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold">Media i prostorije</h2>
-      <div className="mt-4 grid gap-3">{apartment.media?.length ? apartment.media.map((m) => <a className="rounded-xl border p-3" href={m.secureUrl} key={m.id} target="_blank">{m.title} · {m.placement} · {m.isPublished ? 'objavljeno' : 'draft'}</a>) : <p>Media za apartman: POTREBNA PROVERA.</p>}</div>
-      <p className="mt-4 text-sm text-stone-600">Tabela prostorija će biti prikazana nakon unosa proverene PDF/PGD specifikacije.</p>
-    </section>
+    <ApartmentMediaManager slug={slug} code={apartment.code} />
   </AdminShell>;
 }
