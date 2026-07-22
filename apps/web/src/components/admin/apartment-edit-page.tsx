@@ -83,12 +83,12 @@ export function ApartmentEditPage({ slug }: { slug: string }) {
       <label className="grid gap-2 md:col-span-2"><span>Opis</span><textarea className="min-h-36 rounded-xl border p-3" value={String(form.description)} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
       <label className="flex items-center gap-3"><input type="checkbox" checked={Boolean(form.isPublished)} onChange={(e) => setForm({ ...form, isPublished: e.target.checked })} /> Objavljeno</label>
     </section>
+    <ApartmentMediaManager apartmentCode={apartment.code} apartmentSlug={apartment.slug} apartmentArea={apartment.marketArea} />
     <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
       <h2 className="text-xl font-semibold">Advanced override za OWNER rolu</h2>
       <p className="mt-2 text-sm text-stone-600">Zvanična polja su zaključana. Izmene zahtevaju backend OWNER autorizaciju i obavezan audit razlog.</p>
       <label className="mt-4 flex items-center gap-3"><input type="checkbox" checked={Boolean(form.overrideOfficialFields)} onChange={(e) => setForm({ ...form, overrideOfficialFields: e.target.checked })} /> overrideOfficialFields</label>
       <label className="mt-4 grid gap-2"><span>Audit razlog</span><input className="rounded-xl border p-3" value={String(form.auditReason)} onChange={(e) => setForm({ ...form, auditReason: e.target.value })} placeholder="Obavezno za izmenu zvaničnih polja" /></label>
     </section>
-    <ApartmentMediaManager slug={slug} code={apartment.code} />
   </AdminShell>;
 }
