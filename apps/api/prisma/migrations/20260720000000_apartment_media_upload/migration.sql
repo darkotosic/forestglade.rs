@@ -1,0 +1,2 @@
+-- The apartment media upload columns/indexes were added in 20260717000000_apartment_media_catalog.
+-- This migration intentionally records the signed image/video upload feature boundary.
