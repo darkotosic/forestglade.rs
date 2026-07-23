@@ -1,3 +1,88 @@
-"use client";import{useCallback,useEffect,useState}from"react";import{adminFetch}from"@/lib/admin-api";import type{AdminUserDto,MediaAssetDto}from"@/lib/types";import{ApartmentMediaUpload}from"./apartment-media-upload";import{ApartmentMediaCard}from"./apartment-media-card";
-type Props={apartmentCode:string;apartmentSlug:string;apartmentArea:string};
-export function ApartmentMediaManager({apartmentCode,apartmentSlug,apartmentArea}:Props){const[media,setMedia]=useState<MediaAssetDto[]>([]);const[loading,setLoading]=useState(true);const[error,setError]=useState("");const[role,setRole]=useState<AdminUserDto["role"]>("SALES");const load=useCallback(async()=>{setLoading(true);setError("");try{const[data,me]=await Promise.all([adminFetch<{ok:true;media:MediaAssetDto[]}>(`/apartments/${apartmentSlug}/media`),adminFetch<{ok:true;admin:AdminUserDto}>("/auth/me")]);setMedia(data.media);setRole(me.admin.role)}catch(e){setError(e instanceof Error?e.message:"Slike i video trenutno nije moguće učitati.")}finally{setLoading(false)}},[apartmentSlug]);useEffect(()=>{void Promise.resolve().then(load)},[load]);const readOnly=role==="SALES";async function move(index:number,direction:-1|1){const target=index+direction;if(target<0||target>=media.length)return;const reordered=[...media];[reordered[index],reordered[target]]=[reordered[target],reordered[index]];setMedia(reordered);try{await adminFetch(`/apartments/${apartmentSlug}/media/reorder`,{method:"POST",body:JSON.stringify({items:reordered.map((x,i)=>({id:x.id,sortOrder:i}))})});await load()}catch(e){setError(e instanceof Error?e.message:"Redosled nije sačuvan.");await load()}}return <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm"><h2 className="text-2xl font-semibold">Slike i video materijali apartmana {apartmentCode}</h2><div className="mt-5"><ApartmentMediaUpload apartmentCode={apartmentCode} apartmentSlug={apartmentSlug} apartmentArea={apartmentArea} hasCover={media.some(x=>x.isCover)} onUploaded={load} readOnly={readOnly}/></div>{loading?<p className="mt-6">Učitavanje medija...</p>:error?<div className="mt-6 rounded-xl bg-red-50 p-4 text-red-700"><p>Slike i video trenutno nije moguće učitati.</p><p>{error}</p><button onClick={()=>void load()}>Pokušajte ponovo</button></div>:media.length===0?<p className="mt-6">Apartman trenutno nema uploadovane slike ili video-snimke.</p>:<div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{media.map((item,i)=><ApartmentMediaCard key={item.id} item={item} onChanged={load} onMove={d=>void move(i,d)} readOnly={readOnly}/>)}</div>}</section>}
+"use client";
+import { useCallback, useEffect, useState } from "react";
+import { adminFetch } from "@/lib/admin-api";
+import type { AdminUserDto, MediaAssetDto } from "@/lib/types";
+import { ApartmentMediaUpload } from "./apartment-media-upload";
+import { ApartmentMediaCard } from "./apartment-media-card";
+type Props = { apartmentCode: string; apartmentSlug: string; apartmentArea: string };
+export function ApartmentMediaManager({ apartmentCode, apartmentSlug, apartmentArea }: Props) {
+  const [media, setMedia] = useState<MediaAssetDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [role, setRole] = useState<AdminUserDto["role"]>("SALES");
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const [data, me] = await Promise.all([
+        adminFetch<{ ok: true; media: MediaAssetDto[] }>(`/apartments/${apartmentSlug}/media`),
+        adminFetch<{ ok: true; admin: AdminUserDto }>("/auth/me"),
+      ]);
+      setMedia(data.media);
+      setRole(me.admin.role);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Slike i video trenutno nije moguće učitati.");
+    } finally {
+      setLoading(false);
+    }
+  }, [apartmentSlug]);
+  useEffect(() => {
+    void Promise.resolve().then(load);
+  }, [load]);
+  const readOnly = role === "SALES";
+  async function move(index: number, direction: -1 | 1) {
+    const target = index + direction;
+    if (target < 0 || target >= media.length) return;
+    const reordered = [...media];
+    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+    setMedia(reordered);
+    try {
+      await adminFetch(`/apartments/${apartmentSlug}/media/reorder`, {
+        method: "POST",
+        body: JSON.stringify({ items: reordered.map((x, i) => ({ id: x.id, sortOrder: i })) }),
+      });
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Redosled nije sačuvan.");
+      await load();
+    }
+  }
+  return (
+    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+      <h2 className="text-2xl font-semibold">Slike i video materijali apartmana {apartmentCode}</h2>
+      <div className="mt-5">
+        <ApartmentMediaUpload
+          apartmentCode={apartmentCode}
+          apartmentSlug={apartmentSlug}
+          apartmentArea={apartmentArea}
+          hasCover={media.some((x) => x.isCover)}
+          onUploaded={load}
+          readOnly={readOnly}
+        />
+      </div>
+      {loading ? (
+        <p className="mt-6">Učitavanje medija...</p>
+      ) : error ? (
+        <div className="mt-6 rounded-xl bg-red-50 p-4 text-red-700">
+          <p>Slike i video trenutno nije moguće učitati.</p>
+          <p>{error}</p>
+          <button onClick={() => void load()}>Pokušajte ponovo</button>
+        </div>
+      ) : media.length === 0 ? (
+        <p className="mt-6">Apartman trenutno nema uploadovane slike ili video-snimke.</p>
+      ) : (
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {media.map((item, i) => (
+            <ApartmentMediaCard
+              key={item.id}
+              item={item}
+              onChanged={load}
+              onMove={(d) => void move(i, d)}
+              readOnly={readOnly}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}

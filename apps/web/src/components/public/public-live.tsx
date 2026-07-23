@@ -4,7 +4,124 @@ import Image from "next/image";
 import { publicFetch } from "@/lib/api";
 import { statusLabels } from "@/lib/admin-api";
 import type { AdminApartmentDto, MediaAssetDto } from "@/lib/types";
-export function PublicApartmentStatus({slug,fallback="Slobodan"}:{slug:string;fallback?:string}){const[s,setS]=useState(fallback);useEffect(()=>{publicFetch<{ok:true;apartment:AdminApartmentDto}>(`/apartments/${slug}`).then(d=>d?.apartment?.status&&setS(statusLabels[d.apartment.status]??d.apartment.status))},[slug]);return <>{s}</>}
-export function PublicApartmentMedia({slug}:{slug:string}){const[media,setMedia]=useState<MediaAssetDto[]>([]);const[loading,setLoading]=useState(true);const[error,setError]=useState("");useEffect(()=>{void Promise.resolve().then(()=>{setLoading(true);setError("");publicFetch<{ok:true;media:MediaAssetDto[]}>(`/media?apartmentSlug=${encodeURIComponent(slug)}`).then(data=>setMedia(data.media??[])).catch(requestError=>setError(requestError instanceof Error?requestError.message:"Media nije moguće učitati.")).finally(()=>setLoading(false))})},[slug]);if(loading)return <p className="mx-auto max-w-7xl px-5 py-8">Učitavanje galerije...</p>;if(error)return <p className="mx-auto max-w-7xl px-5 py-8 text-red-700">{error}</p>;if(!media.length)return <p className="mx-auto max-w-7xl px-5 py-8 text-stone-600">Fotografije i video prezentacija biće uskoro dostupni.</p>;return <section className="mx-auto max-w-7xl px-5 py-10"><h2 className="text-3xl font-semibold text-forest-950">Galerija apartmana</h2><div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{media.map(item=>{const isVideo=item.type==="VIDEO"||item.type==="VIRTUAL_TOUR"||item.cloudinaryResourceType==="video";if(isVideo)return <article key={item.id}><video src={item.secureUrl} controls playsInline preload="metadata" className="aspect-video w-full rounded-2xl bg-black object-contain"/><p className="mt-2 font-medium">{item.title}</p></article>;const contain=item.type==="FLOOR_PLAN"||item.placement==="APARTMENT_PLAN";return <article key={item.id}><Image src={item.secureUrl} alt={item.alt??item.title} width={1200} height={900} unoptimized className={contain?"aspect-[4/3] w-full rounded-2xl bg-white object-contain":"aspect-[4/3] w-full rounded-2xl object-cover"}/><p className="mt-2 font-medium">{item.title}</p></article>})}</div></section>}
-function LiveMedia({placements}:{placements:string}){const[m,setM]=useState<MediaAssetDto[]>([]);useEffect(()=>{Promise.all(placements.split(',').map(p=>publicFetch<{ok:true;media:MediaAssetDto[]}>(`/media?placement=${p}`))).then(r=>setM(r.flatMap(x=>x?.media??[])))},[placements]); if(!m.length)return null; return <section className="mx-auto grid max-w-7xl gap-4 px-5 py-10 md:grid-cols-3">{m.map(x=>x.type==='VIDEO'||x.type==='VIRTUAL_TOUR'?<video key={x.id} src={x.secureUrl} controls className="rounded-2xl"/>:<Image unoptimized key={x.id} src={x.secureUrl} alt={x.alt??x.title} width={800} height={600} className="rounded-2xl"/> )}</section>}
-export function GalleryLiveMedia(){return <LiveMedia placements="PROJECT_GALLERY,EXTERIOR,INTERIOR"/>}
+export function PublicApartmentStatus({
+  slug,
+  fallback = "Slobodan",
+}: {
+  slug: string;
+  fallback?: string;
+}) {
+  const [s, setS] = useState(fallback);
+  useEffect(() => {
+    publicFetch<{ ok: true; apartment: AdminApartmentDto }>(`/apartments/${slug}`).then(
+      (d) => d?.apartment?.status && setS(statusLabels[d.apartment.status] ?? d.apartment.status),
+    );
+  }, [slug]);
+  return <>{s}</>;
+}
+export function PublicApartmentMedia({ slug }: { slug: string }) {
+  const [media, setMedia] = useState<MediaAssetDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    void Promise.resolve().then(() => {
+      setLoading(true);
+      setError("");
+      publicFetch<{ ok: true; media: MediaAssetDto[] }>(
+        `/media?apartmentSlug=${encodeURIComponent(slug)}`,
+      )
+        .then((data) => setMedia(data.media ?? []))
+        .catch((requestError) =>
+          setError(
+            requestError instanceof Error ? requestError.message : "Media nije moguće učitati.",
+          ),
+        )
+        .finally(() => setLoading(false));
+    });
+  }, [slug]);
+  if (loading) return <p className="mx-auto max-w-7xl px-5 py-8">Učitavanje galerije...</p>;
+  if (error) return <p className="mx-auto max-w-7xl px-5 py-8 text-red-700">{error}</p>;
+  if (!media.length)
+    return (
+      <p className="mx-auto max-w-7xl px-5 py-8 text-stone-600">
+        Fotografije i video prezentacija biće uskoro dostupni.
+      </p>
+    );
+  return (
+    <section className="mx-auto max-w-7xl px-5 py-10">
+      <h2 className="text-3xl font-semibold text-forest-950">Galerija apartmana</h2>
+      <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {media.map((item) => {
+          const isVideo =
+            item.type === "VIDEO" ||
+            item.type === "VIRTUAL_TOUR" ||
+            item.cloudinaryResourceType === "video";
+          if (isVideo)
+            return (
+              <article key={item.id}>
+                <video
+                  src={item.secureUrl}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="aspect-video w-full rounded-2xl bg-black object-contain"
+                />
+                <p className="mt-2 font-medium">{item.title}</p>
+              </article>
+            );
+          const contain = item.type === "FLOOR_PLAN" || item.placement === "APARTMENT_PLAN";
+          return (
+            <article key={item.id}>
+              <Image
+                src={item.secureUrl}
+                alt={item.alt ?? item.title}
+                width={1200}
+                height={900}
+                unoptimized
+                className={
+                  contain
+                    ? "aspect-[4/3] w-full rounded-2xl bg-white object-contain"
+                    : "aspect-[4/3] w-full rounded-2xl object-cover"
+                }
+              />
+              <p className="mt-2 font-medium">{item.title}</p>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+function LiveMedia({ placements }: { placements: string }) {
+  const [m, setM] = useState<MediaAssetDto[]>([]);
+  useEffect(() => {
+    Promise.all(
+      placements
+        .split(",")
+        .map((p) => publicFetch<{ ok: true; media: MediaAssetDto[] }>(`/media?placement=${p}`)),
+    ).then((r) => setM(r.flatMap((x) => x?.media ?? [])));
+  }, [placements]);
+  if (!m.length) return null;
+  return (
+    <section className="mx-auto grid max-w-7xl gap-4 px-5 py-10 md:grid-cols-3">
+      {m.map((x) =>
+        x.type === "VIDEO" || x.type === "VIRTUAL_TOUR" ? (
+          <video key={x.id} src={x.secureUrl} controls className="rounded-2xl" />
+        ) : (
+          <Image
+            unoptimized
+            key={x.id}
+            src={x.secureUrl}
+            alt={x.alt ?? x.title}
+            width={800}
+            height={600}
+            className="rounded-2xl"
+          />
+        ),
+      )}
+    </section>
+  );
+}
+export function GalleryLiveMedia() {
+  return <LiveMedia placements="PROJECT_GALLERY,EXTERIOR,INTERIOR" />;
+}

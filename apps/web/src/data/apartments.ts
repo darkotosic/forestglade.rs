@@ -40,4 +40,9 @@ export function getApartment(slug: string) {
   return apartments.find((apartment) => apartment.slug === slug);
 }
 
-export { FLOOR_LABELS, MATERIALIZATION_FACTS, OFFICIAL_APARTMENTS, OFFICIAL_PROJECT_FACTS } from "@forestglade/project-data";
+export {
+  FLOOR_LABELS,
+  MATERIALIZATION_FACTS,
+  OFFICIAL_APARTMENTS,
+  OFFICIAL_PROJECT_FACTS,
+} from "@forestglade/project-data";

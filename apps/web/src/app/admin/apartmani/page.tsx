@@ -1,4 +1,74 @@
 "use client";
 import type { AdminApartmentDto } from "@/lib/types";
-import Link from "next/link";import {useEffect,useMemo,useState}from"react";import {AdminShell}from"@/components/admin/admin-shell";import{AdminTable}from"@/components/admin/admin-table";import{StatusBadge}from"@/components/admin/status-badge";import{adminFetch}from"@/lib/admin-api";
-export default function Page(){const[a,setA]=useState<AdminApartmentDto[]>([]);const[q,setQ]=useState('');const[st,setSt]=useState('');useEffect(()=>{adminFetch<{ok:true;apartments:AdminApartmentDto[]}>('/apartments').then(d=>setA(d.apartments))},[]);const rows=useMemo(()=>a.filter(x=>(!q||x.code.toLowerCase().includes(q.toLowerCase()))&&(!st||x.status===st)),[a,q,st]);return <AdminShell><h1 className="text-3xl font-semibold">Apartmani</h1><div className="my-6 flex gap-3"><input className="rounded-xl border p-3" placeholder="Pretraga A1..." onChange={e=>setQ(e.target.value)}/><select className="rounded-xl border p-3" onChange={e=>setSt(e.target.value)}><option value="">Svi statusi</option>{['AVAILABLE','RESERVED','SOLD','HIDDEN'].map(s=><option key={s}>{s}</option>)}</select></div><AdminTable><thead><tr>{['Šifra','Sprat','Tip','Površina','Status','Cena','Objavljeno','Akcija'].map(h=><th className="p-3" key={h}>{h}</th>)}</tr></thead><tbody>{rows.map(x=><tr className="border-t" key={x.id}><td className="p-3">{x.code}</td><td>{x.floor}</td><td>{x.officialType}</td><td>{x.marketArea} m²</td><td><StatusBadge status={x.status}/></td><td>{x.price??'—'}</td><td>{x.isPublished?'Da':'Ne'}</td><td><Link href={`/admin/apartmani/${x.slug}`}>Uredi</Link></td></tr>)}</tbody></AdminTable></AdminShell>}
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { AdminShell } from "@/components/admin/admin-shell";
+import { AdminTable } from "@/components/admin/admin-table";
+import { StatusBadge } from "@/components/admin/status-badge";
+import { adminFetch } from "@/lib/admin-api";
+export default function Page() {
+  const [a, setA] = useState<AdminApartmentDto[]>([]);
+  const [q, setQ] = useState("");
+  const [st, setSt] = useState("");
+  useEffect(() => {
+    adminFetch<{ ok: true; apartments: AdminApartmentDto[] }>("/apartments").then((d) =>
+      setA(d.apartments),
+    );
+  }, []);
+  const rows = useMemo(
+    () =>
+      a.filter(
+        (x) => (!q || x.code.toLowerCase().includes(q.toLowerCase())) && (!st || x.status === st),
+      ),
+    [a, q, st],
+  );
+  return (
+    <AdminShell>
+      <h1 className="text-3xl font-semibold">Apartmani</h1>
+      <div className="my-6 flex gap-3">
+        <input
+          className="rounded-xl border p-3"
+          placeholder="Pretraga A1..."
+          onChange={(e) => setQ(e.target.value)}
+        />
+        <select className="rounded-xl border p-3" onChange={(e) => setSt(e.target.value)}>
+          <option value="">Svi statusi</option>
+          {["AVAILABLE", "RESERVED", "SOLD", "HIDDEN"].map((s) => (
+            <option key={s}>{s}</option>
+          ))}
+        </select>
+      </div>
+      <AdminTable>
+        <thead>
+          <tr>
+            {["Šifra", "Sprat", "Tip", "Površina", "Status", "Cena", "Objavljeno", "Akcija"].map(
+              (h) => (
+                <th className="p-3" key={h}>
+                  {h}
+                </th>
+              ),
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((x) => (
+            <tr className="border-t" key={x.id}>
+              <td className="p-3">{x.code}</td>
+              <td>{x.floor}</td>
+              <td>{x.officialType}</td>
+              <td>{x.marketArea} m²</td>
+              <td>
+                <StatusBadge status={x.status} />
+              </td>
+              <td>{x.price ?? "—"}</td>
+              <td>{x.isPublished ? "Da" : "Ne"}</td>
+              <td>
+                <Link href={`/admin/apartmani/${x.slug}`}>Uredi</Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </AdminTable>
+    </AdminShell>
+  );
+}

@@ -15,7 +15,8 @@ function getSeparators(raw: string) {
   const lastDot = raw.lastIndexOf(".");
   const decimalSeparator = lastComma > lastDot ? "," : lastDot > lastComma ? "." : "";
   const decimalPlaces = decimalSeparator ? raw.length - raw.lastIndexOf(decimalSeparator) - 1 : 0;
-  const thousandsSeparator = decimalSeparator === "," ? (raw.includes(".") ? "." : "") : raw.includes(",") ? "," : "";
+  const thousandsSeparator =
+    decimalSeparator === "," ? (raw.includes(".") ? "." : "") : raw.includes(",") ? "," : "";
 
   return { decimalPlaces, decimalSeparator, thousandsSeparator };
 }
@@ -29,7 +30,9 @@ function parseNumericValue(raw: string) {
 
   const token = match[0];
   const { decimalPlaces, decimalSeparator, thousandsSeparator } = getSeparators(token);
-  const withoutThousands = thousandsSeparator ? token.replace(new RegExp(`\\${thousandsSeparator}`, "g"), "") : token;
+  const withoutThousands = thousandsSeparator
+    ? token.replace(new RegExp(`\\${thousandsSeparator}`, "g"), "")
+    : token;
   const normalized = withoutThousands.replace(decimalSeparator, ".");
   const target = Number(normalized);
 
@@ -49,10 +52,17 @@ function parseNumericValue(raw: string) {
   };
 }
 
-function formatNumber(value: number, decimalPlaces: number, decimalSeparator: string, thousandsSeparator: string) {
+function formatNumber(
+  value: number,
+  decimalPlaces: number,
+  decimalSeparator: string,
+  thousandsSeparator: string,
+) {
   const fixed = value.toFixed(decimalPlaces);
   const [integer, decimal] = fixed.split(".");
-  const grouped = thousandsSeparator ? integer.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator) : integer;
+  const grouped = thousandsSeparator
+    ? integer.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator)
+    : integer;
 
   return decimalPlaces ? `${grouped}${decimalSeparator}${decimal}` : grouped;
 }
@@ -85,7 +95,9 @@ export function AnimatedNumber({ value, className, duration = 1400 }: AnimatedNu
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = parsed.target * eased;
 
-      setDisplayValue(`${parsed.prefix}${formatNumber(current, parsed.decimalPlaces, parsed.decimalSeparator, parsed.thousandsSeparator)}${parsed.suffix}`);
+      setDisplayValue(
+        `${parsed.prefix}${formatNumber(current, parsed.decimalPlaces, parsed.decimalSeparator, parsed.thousandsSeparator)}${parsed.suffix}`,
+      );
 
       if (progress < 1) {
         frame = requestAnimationFrame(animate);
@@ -95,7 +107,9 @@ export function AnimatedNumber({ value, className, duration = 1400 }: AnimatedNu
     };
 
     const start = () => {
-      setDisplayValue(`${parsed.prefix}${formatNumber(0, parsed.decimalPlaces, parsed.decimalSeparator, parsed.thousandsSeparator)}${parsed.suffix}`);
+      setDisplayValue(
+        `${parsed.prefix}${formatNumber(0, parsed.decimalPlaces, parsed.decimalSeparator, parsed.thousandsSeparator)}${parsed.suffix}`,
+      );
       frame = requestAnimationFrame(animate);
     };
 
@@ -117,5 +131,9 @@ export function AnimatedNumber({ value, className, duration = 1400 }: AnimatedNu
     };
   }, [duration, parsed, rawValue]);
 
-  return <span ref={elementRef} className={className}>{displayValue}</span>;
+  return (
+    <span ref={elementRef} className={className}>
+      {displayValue}
+    </span>
+  );
 }

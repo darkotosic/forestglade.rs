@@ -11,14 +11,29 @@
     "dev:web": "npm --workspace apps/web run dev",
     "build:web": "npm --workspace apps/web run build",
     "lint:web": "npm --workspace apps/web run lint",
+    "test:web": "npm --workspace apps/web run test",
     "dev:api": "npm --workspace apps/api run dev",
     "build:api": "npm --workspace apps/api run build",
     "start:api": "npm --workspace apps/api run start",
+    "test:api": "npm --workspace apps/api run test",
     "prisma:generate": "npm --workspace apps/api run prisma:generate",
     "prisma:migrate": "npm --workspace apps/api run prisma:migrate",
+    "prisma:validate": "npm --workspace apps/api run prisma:validate",
     "build:project-data": "npm --workspace packages/project-data run build",
-    "typecheck:api": "npm --workspace apps/api run lint",
+    "typecheck:api": "npm --workspace apps/api run typecheck",
+    "typecheck:web": "npm --workspace apps/web run typecheck",
+    "typecheck": "npm run typecheck:api && npm run typecheck:web",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run test:web && npm run test:api",
     "build": "npm run build:project-data && npm run build:api && npm run build:web",
-    "check": "npm run build:project-data && npm run typecheck:api && npm run lint:web && npm run build:web"
+    "check": "npm run format:check && npm run prisma:validate && npm run build:project-data && npm run typecheck:api && npm run lint:web && npm run test && npm run build:api && npm run build:web"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6"
+  },
+  "packageManager": "npm@11.4.2",
+  "engines": {
+    "node": ">=22 <23"
   }
 }

@@ -7,11 +7,15 @@
     "dev": "tsx watch src/server.ts",
     "build": "prisma generate && tsc",
     "start": "node dist/server.js",
-    "start:migrate": "prisma migrate deploy && node dist/seed-apartments.js && node dist/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
-    "lint": "tsc --noEmit",
-    "seed:apartments": "tsx src/seed-apartments.ts"
+    "lint": "prisma generate && tsc --noEmit",
+    "seed:apartments": "tsx src/seed-apartments.ts",
+    "release:migrate": "prisma migrate deploy",
+    "release:seed-official": "node dist/seed-apartments.js",
+    "prisma:validate": "DATABASE_URL=postgresql://user:pass@localhost:5432/forestglade prisma validate",
+    "typecheck": "prisma generate && tsc --noEmit",
+    "test": "node --test"
   },
   "dependencies": {
     "@forestglade/project-data": "file:../../packages/project-data",

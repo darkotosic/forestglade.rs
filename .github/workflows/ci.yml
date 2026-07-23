@@ -22,10 +22,14 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci --include=dev
-      - run: npm --workspace packages/project-data run build
-      - run: npm --workspace apps/api run prisma:generate
-      - run: npm --workspace apps/api run lint
-      - run: npm --workspace apps/api run build
-      - run: npm --workspace apps/web run lint
-      - run: npm --workspace apps/web run build
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run prisma:validate
+      - run: npm run build:project-data
+      - run: npm run typecheck:api
+      - run: npm run lint:web
+      - run: npm run test
+      - run: npm run build:api
+      - run: npm run build:web
+      - run: docker build -t forestglade-api .
+      - run: docker run --rm forestglade-api node --version

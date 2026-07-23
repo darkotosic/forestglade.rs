@@ -1,10 +1,69 @@
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/section-heading";
 
-export const metadata: Metadata = { title: "O nama", description: "Forest Glade d.o.o — savremeni rezidencijalni i apart-hotel razvoj." };
+export const metadata: Metadata = {
+  title: "O nama",
+  description: "Forest Glade d.o.o — savremeni rezidencijalni i apart-hotel razvoj.",
+};
 const values = ["Preciznost", "Kvalitet", "Dugoročna vrednost"];
-const materials = ["ravne linije i kubusi", "demit fasada", "imitacija kamena", "imitacija drveta", "savremena pastelna fasada", "PVC stolarija sa roletnama", "aluminijumski ulaz", "kvalitetna završna obrada", "kuhinje i kupatila sa keramikom"];
+const materials = [
+  "ravne linije i kubusi",
+  "demit fasada",
+  "imitacija kamena",
+  "imitacija drveta",
+  "savremena pastelna fasada",
+  "PVC stolarija sa roletnama",
+  "aluminijumski ulaz",
+  "kvalitetna završna obrada",
+  "kuhinje i kupatila sa keramikom",
+];
 
 export default function ONamaPage() {
-  return <main className="bg-ivory-100"><section className="bg-forest-950 px-5 py-20 text-white lg:px-8"><div className="mx-auto max-w-7xl"><SectionHeading light eyebrow="O nama" title="Forest Glade d.o.o gradi poverenje kroz kvalitet, dokumentaciju i jasan pristup kupcima." description="Kompanija je fokusirana na moderan rezidencijalni i apart-hotel razvoj, praktične rasporede, arhitekturu i prodajnu transparentnost." /></div></section><section className="mx-auto max-w-7xl px-5 py-16 lg:px-8"><div className="grid gap-6 md:grid-cols-3">{values.map((value) => <article key={value} className="rounded-[2rem] bg-white p-8 shadow-sm"><p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold-500">Vrednost</p><h2 className="mt-5 text-3xl font-semibold text-forest-950">{value}</h2><p className="mt-4 leading-7 text-stone-600">Pažljivo vođenje projekta, kvalitetna realizacija i odluke koje stvaraju trajnu vrednost za kupce i investitore.</p></article>)}</div><div className="mt-10 rounded-[2rem] bg-white p-8 shadow-sm md:p-12"><SectionHeading eyebrow="Materijalizacija" title="Savremena arhitektura usklađena sa ambijentom Vrdnika" description="Arhitektonski izraz objekta naglašava premium, miran i prirodan karakter apart-hotela." /><div className="mt-8 flex flex-wrap gap-3">{materials.map((item) => <span key={item} className="rounded-full bg-ivory-100 px-4 py-2 text-sm font-medium text-forest-950">{item}</span>)}</div></div></section></main>;
+  return (
+    <main className="bg-ivory-100">
+      <section className="bg-forest-950 px-5 py-20 text-white lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <SectionHeading
+            light
+            eyebrow="O nama"
+            title="Forest Glade d.o.o gradi poverenje kroz kvalitet, dokumentaciju i jasan pristup kupcima."
+            description="Kompanija je fokusirana na moderan rezidencijalni i apart-hotel razvoj, praktične rasporede, arhitekturu i prodajnu transparentnost."
+          />
+        </div>
+      </section>
+      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+        <div className="grid gap-6 md:grid-cols-3">
+          {values.map((value) => (
+            <article key={value} className="rounded-[2rem] bg-white p-8 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gold-500">
+                Vrednost
+              </p>
+              <h2 className="mt-5 text-3xl font-semibold text-forest-950">{value}</h2>
+              <p className="mt-4 leading-7 text-stone-600">
+                Pažljivo vođenje projekta, kvalitetna realizacija i odluke koje stvaraju trajnu
+                vrednost za kupce i investitore.
+              </p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-10 rounded-[2rem] bg-white p-8 shadow-sm md:p-12">
+          <SectionHeading
+            eyebrow="Materijalizacija"
+            title="Savremena arhitektura usklađena sa ambijentom Vrdnika"
+            description="Arhitektonski izraz objekta naglašava premium, miran i prirodan karakter apart-hotela."
+          />
+          <div className="mt-8 flex flex-wrap gap-3">
+            {materials.map((item) => (
+              <span
+                key={item}
+                className="rounded-full bg-ivory-100 px-4 py-2 text-sm font-medium text-forest-950"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
 }

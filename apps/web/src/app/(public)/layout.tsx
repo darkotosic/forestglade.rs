@@ -1,5 +1,11 @@
 import { Footer, Header } from "@/components/site-shell";
 
 export default function PublicLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <><Header />{children}<Footer /></>;
+  return (
+    <>
+      <Header />
+      {children}
+      <Footer />
+    </>
+  );
 }

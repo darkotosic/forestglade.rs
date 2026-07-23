@@ -1,4 +1,29 @@
 import type { Metadata } from "next";
 import { OFFICIAL_APARTMENTS } from "@forestglade/project-data";
-export const metadata: Metadata = { title: "Virtuelne šetnje | Forest Glade", description: "Status virtuelnih šetnji po apartmanima." };
-export default function Page(){return <main><section className="bg-stone-100"><div className="mx-auto max-w-7xl px-5 py-20 lg:px-8"><p className="text-sm uppercase tracking-[0.35em] text-forest-700">Virtuelne šetnje</p><h1 className="mt-3 text-5xl font-semibold text-forest-950">A1–A31</h1></div></section><section className="mx-auto grid max-w-7xl gap-4 px-5 py-16 md:grid-cols-3 lg:px-8">{OFFICIAL_APARTMENTS.map(a=><article className="rounded-2xl bg-white p-5 shadow-sm" key={a.slug}><h2 className="text-xl font-semibold">Apartman {a.code}</h2><p>{a.floor} · {a.marketArea} m²</p><p className="mt-3 text-amber-700">Virtuelna šetnja: POTREBNA PROVERA</p></article>)}</section></main>}
+export const metadata: Metadata = {
+  title: "Virtuelne šetnje | Forest Glade",
+  description: "Status virtuelnih šetnji po apartmanima.",
+};
+export default function Page() {
+  return (
+    <main>
+      <section className="bg-stone-100">
+        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <p className="text-sm uppercase tracking-[0.35em] text-forest-700">Virtuelne šetnje</p>
+          <h1 className="mt-3 text-5xl font-semibold text-forest-950">A1–A31</h1>
+        </div>
+      </section>
+      <section className="mx-auto grid max-w-7xl gap-4 px-5 py-16 md:grid-cols-3 lg:px-8">
+        {OFFICIAL_APARTMENTS.map((a) => (
+          <article className="rounded-2xl bg-white p-5 shadow-sm" key={a.slug}>
+            <h2 className="text-xl font-semibold">Apartman {a.code}</h2>
+            <p>
+              {a.floor} · {a.marketArea} m²
+            </p>
+            <p className="mt-3 text-amber-700">Virtuelna šetnja: POTREBNA PROVERA</p>
+          </article>
+        ))}
+      </section>
+    </main>
+  );
+}

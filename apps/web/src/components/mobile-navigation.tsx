@@ -2,17 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Building2,
-  Camera,
-  Home,
-  Info,
-  LayoutGrid,
-  Mail,
-  Menu,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { Building2, Camera, Home, Info, LayoutGrid, Mail, Menu, Sparkles, X } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { navigation } from "@/lib/site";
 
@@ -93,7 +83,9 @@ export function MobileNavigation() {
   const openMenu = useCallback(() => setIsOpen(true), []);
 
   const activeSectionIndex = useMemo(() => {
-    const index = navigation.findIndex((item) => (item.href === "/" ? pathname === item.href : pathname.startsWith(item.href)));
+    const index = navigation.findIndex((item) =>
+      item.href === "/" ? pathname === item.href : pathname.startsWith(item.href),
+    );
 
     return index >= 0 ? index : 0;
   }, [pathname]);
@@ -179,10 +171,15 @@ export function MobileNavigation() {
         className={`fixed inset-y-0 right-0 z-[70] flex h-dvh w-full max-w-[28rem] transform-gpu flex-col overflow-hidden overscroll-contain border-l border-white/10 bg-forest-950 text-white shadow-2xl transition-transform duration-300 ease-out will-change-transform ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         <div className="relative overflow-hidden border-b border-white/10 px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(201,162,39,0.22),transparent_34rem)]" aria-hidden="true" />
+          <div
+            className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(201,162,39,0.22),transparent_34rem)]"
+            aria-hidden="true"
+          />
           <div className="relative flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-gold-300">Navigacija</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-gold-300">
+                Navigacija
+              </p>
               <p className="mt-2 text-2xl font-semibold tracking-tight">Forest Glade</p>
               <p className="mt-2 max-w-[17rem] text-sm leading-6 text-mist-200">
                 Brz pristup projektu, apartmanima i prodajnom timu.
@@ -202,10 +199,15 @@ export function MobileNavigation() {
           <div className="relative mt-5 overflow-hidden rounded-2xl border border-gold-300/25 bg-white/[0.06] p-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-mist-300">Trenutno otvoreno</p>
+                <p className="text-xs uppercase tracking-[0.25em] text-mist-300">
+                  Trenutno otvoreno
+                </p>
                 <p className="mt-1 font-semibold text-gold-300">{activeSection.label}</p>
               </div>
-              <p className="rounded-full border border-gold-300/30 bg-forest-950/40 px-3 py-1 text-sm font-semibold tabular-nums text-gold-300 transition-colors duration-300" aria-label={`Stavka ${activeSectionNumber} od ${navigationTotal}`}>
+              <p
+                className="rounded-full border border-gold-300/30 bg-forest-950/40 px-3 py-1 text-sm font-semibold tabular-nums text-gold-300 transition-colors duration-300"
+                aria-label={`Stavka ${activeSectionNumber} od ${navigationTotal}`}
+              >
                 {String(activeSectionNumber).padStart(2, "0")}
                 <span className="mx-1 text-mist-400">/</span>
                 {String(navigationTotal).padStart(2, "0")}
@@ -220,11 +222,17 @@ export function MobileNavigation() {
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-5" aria-label="Mobilna navigacija">
+        <nav
+          className="flex-1 overflow-y-auto overscroll-contain px-4 py-5"
+          aria-label="Mobilna navigacija"
+        >
           <div className="grid gap-2">
             {navigation.map((item, index) => {
-              const isActive = item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
-              const enhancement = navigationEnhancements[item.href as keyof typeof navigationEnhancements] ?? defaultNavigationEnhancement;
+              const isActive =
+                item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
+              const enhancement =
+                navigationEnhancements[item.href as keyof typeof navigationEnhancements] ??
+                defaultNavigationEnhancement;
               const Icon = enhancement.icon;
 
               return (
@@ -235,14 +243,22 @@ export function MobileNavigation() {
                   onClick={closeMenu}
                   className={`group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border p-3.5 transition focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-forest-950 ${isActive ? "border-gold-300 bg-gold-300 text-forest-950 shadow-lg shadow-gold-300/10" : "border-white/10 bg-white/[0.04] text-mist-100 hover:border-gold-300/70 hover:bg-white/[0.07] hover:text-white"}`}
                 >
-                  <span className={`flex size-11 items-center justify-center rounded-xl ${isActive ? "bg-forest-950/10" : "bg-white/10 text-gold-300"}`}>
+                  <span
+                    className={`flex size-11 items-center justify-center rounded-xl ${isActive ? "bg-forest-950/10" : "bg-white/10 text-gold-300"}`}
+                  >
                     <Icon aria-hidden="true" size={20} />
                   </span>
                   <span>
                     <span className="block text-base font-semibold">{item.label}</span>
-                    <span className={`mt-0.5 block text-sm leading-5 ${isActive ? "text-forest-900/80" : "text-mist-300"}`}>{enhancement.description}</span>
+                    <span
+                      className={`mt-0.5 block text-sm leading-5 ${isActive ? "text-forest-900/80" : "text-mist-300"}`}
+                    >
+                      {enhancement.description}
+                    </span>
                   </span>
-                  <span className={`text-xs font-semibold tabular-nums transition-colors duration-300 ${isActive ? "text-forest-900/70" : "text-mist-400 group-hover:text-gold-300"}`}>
+                  <span
+                    className={`text-xs font-semibold tabular-nums transition-colors duration-300 ${isActive ? "text-forest-900/70" : "text-mist-400 group-hover:text-gold-300"}`}
+                  >
                     {String(index + 1).padStart(2, "0")}
                   </span>
                 </Link>

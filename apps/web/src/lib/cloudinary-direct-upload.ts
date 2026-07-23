@@ -1,3 +1,63 @@
-type DirectUploadOptions = { file: File; cloudName: string; apiKey: string; timestamp: number; signature: string; folder: string; resourceType: "image" | "video"; uploadPreset?: string; onProgress?: (percentage: number) => void };
-export type CloudinaryUploadResult = { public_id: string; secure_url: string; version: number; signature: string; resource_type: string; format?: string; width?: number; height?: number; bytes?: number; duration?: number };
-export function uploadDirectlyToCloudinary(options: DirectUploadOptions): Promise<CloudinaryUploadResult> { return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); xhr.open("POST", `https://api.cloudinary.com/v1_1/${options.cloudName}/${options.resourceType}/upload`); xhr.upload.addEventListener("progress", (event) => { if (event.lengthComputable) options.onProgress?.(Math.round((event.loaded / event.total) * 100)); }); xhr.addEventListener("load", () => { let result: CloudinaryUploadResult & { error?: { message?: string } }; try { result = JSON.parse(xhr.responseText) as CloudinaryUploadResult & { error?: { message?: string } }; } catch { reject(new Error("Cloudinary upload nije uspeo.")); return; } if (xhr.status < 200 || xhr.status >= 300) { reject(new Error(result.error?.message ?? "Cloudinary upload nije uspeo.")); return; } resolve(result); }); xhr.addEventListener("error", () => reject(new Error("Mrežna greška tokom slanja fajla."))); const formData = new FormData(); formData.set("file", options.file); formData.set("api_key", options.apiKey); formData.set("timestamp", String(options.timestamp)); formData.set("signature", options.signature); formData.set("folder", options.folder); if (options.uploadPreset) formData.set("upload_preset", options.uploadPreset); xhr.send(formData); }); }
+type DirectUploadOptions = {
+  file: File;
+  cloudName: string;
+  apiKey: string;
+  timestamp: number;
+  signature: string;
+  folder: string;
+  resourceType: "image" | "video";
+  uploadPreset?: string;
+  onProgress?: (percentage: number) => void;
+};
+export type CloudinaryUploadResult = {
+  public_id: string;
+  secure_url: string;
+  version: number;
+  signature: string;
+  resource_type: string;
+  format?: string;
+  width?: number;
+  height?: number;
+  bytes?: number;
+  duration?: number;
+};
+export function uploadDirectlyToCloudinary(
+  options: DirectUploadOptions,
+): Promise<CloudinaryUploadResult> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(
+      "POST",
+      `https://api.cloudinary.com/v1_1/${options.cloudName}/${options.resourceType}/upload`,
+    );
+    xhr.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable)
+        options.onProgress?.(Math.round((event.loaded / event.total) * 100));
+    });
+    xhr.addEventListener("load", () => {
+      let result: CloudinaryUploadResult & { error?: { message?: string } };
+      try {
+        result = JSON.parse(xhr.responseText) as CloudinaryUploadResult & {
+          error?: { message?: string };
+        };
+      } catch {
+        reject(new Error("Cloudinary upload nije uspeo."));
+        return;
+      }
+      if (xhr.status < 200 || xhr.status >= 300) {
+        reject(new Error(result.error?.message ?? "Cloudinary upload nije uspeo."));
+        return;
+      }
+      resolve(result);
+    });
+    xhr.addEventListener("error", () => reject(new Error("Mrežna greška tokom slanja fajla.")));
+    const formData = new FormData();
+    formData.set("file", options.file);
+    formData.set("api_key", options.apiKey);
+    formData.set("timestamp", String(options.timestamp));
+    formData.set("signature", options.signature);
+    formData.set("folder", options.folder);
+    if (options.uploadPreset) formData.set("upload_preset", options.uploadPreset);
+    xhr.send(formData);
+  });
+}

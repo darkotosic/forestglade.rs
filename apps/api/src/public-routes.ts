@@ -3,10 +3,135 @@ import { asyncHandler, ApiError } from "./errors.js";
 import { prisma } from "./prisma.js";
 export const publicRouter = express.Router();
 
-const mediaSelect={id:true,title:true,alt:true,caption:true,secureUrl:true,thumbnailUrl:true,originalFilename:true,cloudinaryResourceType:true,placement:true,type:true,isPublished:true,isCover:true,sortOrder:true,format:true,width:true,height:true,durationSeconds:true,bytes:true} as const;
-export async function resolvePublishedApartmentId(slug:string){const apartment=await prisma.apartment.findUnique({where:{slug},select:{id:true,isPublished:true}});if(!apartment||!apartment.isPublished)throw new ApiError(404,"Apartman nije pronađen.","APARTMENT_NOT_FOUND");return apartment.id;}
+const mediaSelect = {
+  id: true,
+  title: true,
+  alt: true,
+  caption: true,
+  secureUrl: true,
+  thumbnailUrl: true,
+  originalFilename: true,
+  cloudinaryResourceType: true,
+  placement: true,
+  type: true,
+  isPublished: true,
+  isCover: true,
+  sortOrder: true,
+  format: true,
+  width: true,
+  height: true,
+  durationSeconds: true,
+  bytes: true,
+} as const;
+export async function resolvePublishedApartmentId(slug: string) {
+  const apartment = await prisma.apartment.findUnique({
+    where: { slug },
+    select: { id: true, isPublished: true },
+  });
+  if (!apartment || !apartment.isPublished)
+    throw new ApiError(404, "Apartman nije pronađen.", "APARTMENT_NOT_FOUND");
+  return apartment.id;
+}
 
-publicRouter.get("/apartments",asyncHandler(async(_req,res)=>res.json({ok:true,apartments:await prisma.apartment.findMany({where:{isPublished:true},orderBy:{sortOrder:"asc"},select:{code:true,slug:true,floor:true,officialType:true,marketArea:true,status:true,price:true,priceNote:true,shortDescription:true,description:true,seoTitle:true,seoDescription:true,media:{where:{isPublished:true,type:{in:["IMAGE","RENDER","FLOOR_PLAN"]}},orderBy:[{isCover:"desc"},{sortOrder:"asc"}],take:5,select:mediaSelect}}})})));
-publicRouter.get("/apartments/:slug",asyncHandler(async(req,res)=>{const apartment=await prisma.apartment.findFirst({where:{slug:String(req.params.slug),isPublished:true},select:{code:true,slug:true,floor:true,officialType:true,marketArea:true,status:true,price:true,priceNote:true,shortDescription:true,description:true,seoTitle:true,seoDescription:true,rooms:{orderBy:{sortOrder:"asc"},select:{id:true,name:true,area:true,floorMaterial:true,sortOrder:true}},media:{where:{isPublished:true},orderBy:[{isCover:"desc"},{sortOrder:"asc"},{createdAt:"asc"}],select:mediaSelect}}});if(!apartment)throw new ApiError(404,"Apartman nije pronađen.","APARTMENT_NOT_FOUND");res.json({ok:true,apartment});}));
-publicRouter.get("/media",asyncHandler(async(req,res)=>{const apartmentSlug=typeof req.query.apartmentSlug==="string"?req.query.apartmentSlug:null;let apartment:null|{id:string}=null;if(apartmentSlug){apartment=await prisma.apartment.findFirst({where:{slug:apartmentSlug,isPublished:true},select:{id:true}});if(!apartment)throw new ApiError(404,"Apartman nije pronađen.","APARTMENT_NOT_FOUND");}const media=await prisma.mediaAsset.findMany({where:{isPublished:true,...(apartment?{apartmentId:apartment.id}:{}),...(req.query.placement?{placement:req.query.placement as never}:{})},orderBy:[{isCover:"desc"},{sortOrder:"asc"}],select:{...mediaSelect,apartment:{select:{code:true,slug:true}}}});res.json({ok:true,media});}));
-publicRouter.get("/settings",asyncHandler(async(_req,res)=>res.json({ok:true,settings:await prisma.siteSetting.findMany({where:{isPublic:true},orderBy:{key:"asc"}})})));
+publicRouter.get(
+  "/apartments",
+  asyncHandler(async (_req, res) =>
+    res.json({
+      ok: true,
+      apartments: await prisma.apartment.findMany({
+        where: { isPublished: true },
+        orderBy: { sortOrder: "asc" },
+        select: {
+          code: true,
+          slug: true,
+          floor: true,
+          officialType: true,
+          marketArea: true,
+          status: true,
+          price: true,
+          priceNote: true,
+          shortDescription: true,
+          description: true,
+          seoTitle: true,
+          seoDescription: true,
+          media: {
+            where: { isPublished: true, type: { in: ["IMAGE", "RENDER", "FLOOR_PLAN"] } },
+            orderBy: [{ isCover: "desc" }, { sortOrder: "asc" }],
+            take: 5,
+            select: mediaSelect,
+          },
+        },
+      }),
+    }),
+  ),
+);
+publicRouter.get(
+  "/apartments/:slug",
+  asyncHandler(async (req, res) => {
+    const apartment = await prisma.apartment.findFirst({
+      where: { slug: String(req.params.slug), isPublished: true },
+      select: {
+        code: true,
+        slug: true,
+        floor: true,
+        officialType: true,
+        marketArea: true,
+        status: true,
+        price: true,
+        priceNote: true,
+        shortDescription: true,
+        description: true,
+        seoTitle: true,
+        seoDescription: true,
+        rooms: {
+          orderBy: { sortOrder: "asc" },
+          select: { id: true, name: true, area: true, floorMaterial: true, sortOrder: true },
+        },
+        media: {
+          where: { isPublished: true },
+          orderBy: [{ isCover: "desc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
+          select: mediaSelect,
+        },
+      },
+    });
+    if (!apartment) throw new ApiError(404, "Apartman nije pronađen.", "APARTMENT_NOT_FOUND");
+    res.json({ ok: true, apartment });
+  }),
+);
+publicRouter.get(
+  "/media",
+  asyncHandler(async (req, res) => {
+    const apartmentSlug =
+      typeof req.query.apartmentSlug === "string" ? req.query.apartmentSlug : null;
+    let apartment: null | { id: string } = null;
+    if (apartmentSlug) {
+      apartment = await prisma.apartment.findFirst({
+        where: { slug: apartmentSlug, isPublished: true },
+        select: { id: true },
+      });
+      if (!apartment) throw new ApiError(404, "Apartman nije pronađen.", "APARTMENT_NOT_FOUND");
+    }
+    const media = await prisma.mediaAsset.findMany({
+      where: {
+        isPublished: true,
+        ...(apartment ? { apartmentId: apartment.id } : {}),
+        ...(req.query.placement ? { placement: req.query.placement as never } : {}),
+      },
+      orderBy: [{ isCover: "desc" }, { sortOrder: "asc" }],
+      select: { ...mediaSelect, apartment: { select: { code: true, slug: true } } },
+    });
+    res.json({ ok: true, media });
+  }),
+);
+publicRouter.get(
+  "/settings",
+  asyncHandler(async (_req, res) =>
+    res.json({
+      ok: true,
+      settings: await prisma.siteSetting.findMany({
+        where: { isPublic: true },
+        orderBy: { key: "asc" },
+      }),
+    }),
+  ),
+);

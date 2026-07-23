@@ -1,4 +1,47 @@
 "use client";
-import{useEffect,useState}from"react";import{AdminShell}from"@/components/admin/admin-shell";import{adminFetch}from"@/lib/admin-api";
-const keys=['companyName','contactEmail','contactPhone','salesPhone','address','presentationCtaText','heroTitle','heroSubtitle','defaultSeoTitle','defaultSeoDescription','netlifyBuildHookUrl'];
-export default function Page(){const[f,setF]=useState<Record<string,string>>({});useEffect(()=>{adminFetch<{ok:true;settings:{key:string;value:unknown}[]}>('/settings').then(d=>setF(Object.fromEntries(d.settings.map((s)=>[s.key,String(s.value)]))))},[]);async function save(){await adminFetch('/settings',{method:'PATCH',body:JSON.stringify(f)})}return <AdminShell><h1 className="text-3xl font-semibold">Podešavanja</h1><div className="mt-6 grid gap-3 rounded-2xl bg-white p-6">{keys.map(k=><input className="rounded-xl border p-3" key={k} placeholder={k} value={f[k]??''} onChange={e=>setF({...f,[k]:e.target.value})}/>) }<button className="rounded-xl bg-forest-900 p-3 text-white" onClick={save}>Sačuvaj</button></div></AdminShell>}
+import { useEffect, useState } from "react";
+import { AdminShell } from "@/components/admin/admin-shell";
+import { adminFetch } from "@/lib/admin-api";
+const keys = [
+  "companyName",
+  "contactEmail",
+  "contactPhone",
+  "salesPhone",
+  "address",
+  "presentationCtaText",
+  "heroTitle",
+  "heroSubtitle",
+  "defaultSeoTitle",
+  "defaultSeoDescription",
+  "netlifyBuildHookUrl",
+];
+export default function Page() {
+  const [f, setF] = useState<Record<string, string>>({});
+  useEffect(() => {
+    adminFetch<{ ok: true; settings: { key: string; value: unknown }[] }>("/settings").then((d) =>
+      setF(Object.fromEntries(d.settings.map((s) => [s.key, String(s.value)]))),
+    );
+  }, []);
+  async function save() {
+    await adminFetch("/settings", { method: "PATCH", body: JSON.stringify(f) });
+  }
+  return (
+    <AdminShell>
+      <h1 className="text-3xl font-semibold">Podešavanja</h1>
+      <div className="mt-6 grid gap-3 rounded-2xl bg-white p-6">
+        {keys.map((k) => (
+          <input
+            className="rounded-xl border p-3"
+            key={k}
+            placeholder={k}
+            value={f[k] ?? ""}
+            onChange={(e) => setF({ ...f, [k]: e.target.value })}
+          />
+        ))}
+        <button className="rounded-xl bg-forest-900 p-3 text-white" onClick={save}>
+          Sačuvaj
+        </button>
+      </div>
+    </AdminShell>
+  );
+}
