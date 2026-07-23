@@ -14,6 +14,8 @@ const rawSchema = z.object({
   CLOUDINARY_API_KEY: z.string().optional(),
   CLOUDINARY_API_SECRET: z.string().optional(),
   CLOUDINARY_FOLDER: z.string().optional().default("forestglade"),
+  CLOUDINARY_IMAGE_UPLOAD_PRESET: z.string().optional().default("forestglade-admin-images"),
+  CLOUDINARY_VIDEO_UPLOAD_PRESET: z.string().optional().default("forestglade-admin-videos"),
   SALES_NOTIFICATION_EMAIL: z.string().optional(),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().positive().optional(),
@@ -43,5 +45,5 @@ export const env = {
   sessionDays: raw.SESSION_DAYS,
   adminBootstrapToken: raw.ADMIN_BOOTSTRAP_TOKEN,
   smtp: { host: raw.SMTP_HOST, port: raw.SMTP_PORT ?? 587, user: raw.SMTP_USER, pass: raw.SMTP_PASS, from: raw.SMTP_FROM, salesTo: raw.SALES_NOTIFICATION_EMAIL },
-  cloudinary: { cloudName: raw.CLOUDINARY_CLOUD_NAME, apiKey: raw.CLOUDINARY_API_KEY, apiSecret: raw.CLOUDINARY_API_SECRET, folder: raw.CLOUDINARY_FOLDER },
+  cloudinary: { cloudName: raw.CLOUDINARY_CLOUD_NAME, apiKey: raw.CLOUDINARY_API_KEY, apiSecret: raw.CLOUDINARY_API_SECRET, folder: raw.CLOUDINARY_FOLDER, imageUploadPreset: raw.CLOUDINARY_IMAGE_UPLOAD_PRESET, videoUploadPreset: raw.CLOUDINARY_VIDEO_UPLOAD_PRESET },
 };

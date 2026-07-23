@@ -19,6 +19,13 @@ enum ApartmentStatus {
   SOLD
   HIDDEN
 }
+enum MediaIngestMethod {
+  LEGACY
+  DIRECT_UPLOAD
+  SERVER_UPLOAD
+  CLOUDINARY_IMPORT
+}
+
 enum MediaType {
   IMAGE
   VIDEO
@@ -177,6 +184,10 @@ model MediaAsset {
   isCover            Boolean        @default(false)
   originalFilename   String?
   cloudinaryResourceType String      @default("image")
+  ingestMethod        MediaIngestMethod @default(LEGACY)
+  cloudinaryAssetId   String?        @unique
+  cloudinaryVersion   Int?
+  importSourceUrl     String?
   createdById        String?
   createdBy          AdminUser?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdAt          DateTime       @default(now())
@@ -187,6 +198,7 @@ model MediaAsset {
   @@index([isPublished])
   @@index([apartmentId, isPublished, sortOrder])
   @@index([apartmentId, isCover])
+  @@unique([cloudinaryResourceType, cloudinaryPublicId], map: "MediaAsset_cloudinary_resource_public_id_key")
 }
 
 model AuditLog {
