@@ -29,6 +29,7 @@ jobs:
       - run: npm run format:check
       - run: npm run prisma:validate
       - run: npm run build:project-data
+      - run: node -e "const fs = require('fs'); if (!fs.existsSync('packages/project-data/dist/index.js')) { throw new Error('project-data dist nije generisan'); }"
       - run: npm run typecheck:api
       - run: npm run typecheck:web
       - run: npm run lint:web
@@ -63,3 +64,15 @@ jobs:
           docker stop --time 15 forestglade-api-smoke
           test "$(docker inspect forestglade-api-smoke --format='{{.State.ExitCode}}')" = "0"
           docker rm forestglade-api-smoke
+
+  clean-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --global npm@11.4.2
+      - run: npm ci
+      - run: npm run build
