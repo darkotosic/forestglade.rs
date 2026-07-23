@@ -1,3 +1,172 @@
-"use client";import{useState}from"react";import{adminFetch}from"@/lib/admin-api";import{parseCatalogFilename}from"@/lib/catalog-filename-parser";
-type Option={id:string;code:string;slug:string;floor:string};type Row={file:File;slug:string|null;placement:string;cover:boolean;status:"spremno"|"upload"|"uspešno"|"neuspešno"|"preskočeno";error?:string};
-export function BulkCatalogImporter({apartments,onDone}:{apartments:Option[];onDone:()=>void}){const[rows,setRows]=useState<Row[]>([]);const[running,setRunning]=useState(false);function choose(files:FileList|null){if(!files)return;setRows(Array.from(files).map(file=>{const parsed=parseCatalogFilename(file.name);return{file,slug:parsed.slug,placement:parsed.placement,cover:parsed.isCover,status:"spremno"}}))}async function uploadOne(index:number){setRows(old=>old.map((r,i)=>i===index?{...r,status:"upload"}:r));const row=rows[index];if(!row.slug)return;const code=apartments.find(a=>a.slug===row.slug)?.code??row.slug.toUpperCase();const fd=new FormData();fd.set("file",row.file);fd.set("title",`Apartman ${code} – prodajni katalog`);fd.set("alt",`Kataloški prikaz apartmana ${code} u objektu Forest Glade, Vrdnik`);fd.set("placement",row.placement);fd.set("type","IMAGE");fd.set("isPublished","true");fd.set("isCover",String(row.cover));try{await adminFetch(`/apartments/${row.slug}/media/upload`,{method:"POST",body:fd});setRows(old=>old.map((r,i)=>i===index?{...r,status:"uspešno",error:undefined}:r))}catch(e){setRows(old=>old.map((r,i)=>i===index?{...r,status:"neuspešno",error:e instanceof Error?e.message:"Greška"}:r))}}async function start(retry=false){if(rows.some(r=>!r.slug))return;setRunning(true);const queue=rows.map((r,i)=>({r,i})).filter(({r})=>retry?r.status==="neuspešno":r.status==="spremno");let cursor=0;await Promise.all(Array.from({length:Math.min(3,queue.length)},async()=>{while(cursor<queue.length){const current=queue[cursor++];await uploadOne(current.i)}}));setRunning(false);onDone()}const counts={success:rows.filter(r=>r.status==="uspešno").length,failed:rows.filter(r=>r.status==="neuspešno").length,skipped:rows.filter(r=>r.status==="preskočeno").length};return <section className="mt-6 rounded-2xl bg-white p-6"><h2 className="text-xl font-semibold">Masovni import kataloga</h2><input className="mt-4" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" onChange={e=>choose(e.target.files)}/>{rows.length>0&&<><div className="mt-4 overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th>Fajl</th><th>Detektovan apartman</th><th>Placement</th><th>Cover</th><th>Status</th></tr></thead><tbody>{rows.map((row,i)=><tr key={`${row.file.name}-${i}`}><td>{row.file.name}</td><td>{row.slug?apartments.find(a=>a.slug===row.slug)?.code:<select aria-label={`Apartman za ${row.file.name}`} value="" onChange={e=>setRows(old=>old.map((r,x)=>x===i?{...r,slug:e.target.value}:r))}><option value="">Nije moguće pouzdano odrediti apartman.</option>{apartments.map(a=><option key={a.id} value={a.slug}>{a.code} – {a.floor}</option>)}</select>}</td><td>{row.placement==="APARTMENT_CATALOG"?"Kataloška strana":row.placement}</td><td>{row.cover?"Da":"Ne"}</td><td>{row.status}{row.error?`: ${row.error}`:""}</td></tr>)}</tbody></table></div><div className="mt-4 flex gap-3"><button disabled={running||rows.some(r=>!r.slug)} onClick={()=>void start()} className="rounded-xl bg-forest-900 px-4 py-2 text-white disabled:opacity-50">{running?"Upload u toku...":"Pokreni upload"}</button>{counts.failed>0&&<button disabled={running} onClick={()=>void start(true)}>Ponovi neuspešne</button>}</div><p className="mt-3">Uspešno: {counts.success} · Neuspešno: {counts.failed} · Preskočeno: {counts.skipped}</p></>}</section>}
+"use client";
+import { useState } from "react";
+import { adminFetch } from "@/lib/admin-api";
+import { parseCatalogFilename } from "@/lib/catalog-filename-parser";
+type Option = { id: string; code: string; slug: string; floor: string };
+type Row = {
+  file: File;
+  slug: string | null;
+  placement: string;
+  cover: boolean;
+  status: "spremno" | "upload" | "uspešno" | "neuspešno" | "preskočeno";
+  error?: string;
+};
+export function BulkCatalogImporter({
+  apartments,
+  onDone,
+}: {
+  apartments: Option[];
+  onDone: () => void;
+}) {
+  const [rows, setRows] = useState<Row[]>([]);
+  const [running, setRunning] = useState(false);
+  function choose(files: FileList | null) {
+    if (!files) return;
+    setRows(
+      Array.from(files).map((file) => {
+        const parsed = parseCatalogFilename(file.name);
+        return {
+          file,
+          slug: parsed.slug,
+          placement: parsed.placement,
+          cover: parsed.isCover,
+          status: "spremno",
+        };
+      }),
+    );
+  }
+  async function uploadOne(index: number) {
+    setRows((old) => old.map((r, i) => (i === index ? { ...r, status: "upload" } : r)));
+    const row = rows[index];
+    if (!row.slug) return;
+    const code = apartments.find((a) => a.slug === row.slug)?.code ?? row.slug.toUpperCase();
+    const fd = new FormData();
+    fd.set("file", row.file);
+    fd.set("title", `Apartman ${code} – prodajni katalog`);
+    fd.set("alt", `Kataloški prikaz apartmana ${code} u objektu Forest Glade, Vrdnik`);
+    fd.set("placement", row.placement);
+    fd.set("type", "IMAGE");
+    fd.set("isPublished", "true");
+    fd.set("isCover", String(row.cover));
+    try {
+      await adminFetch(`/apartments/${row.slug}/media/upload`, { method: "POST", body: fd });
+      setRows((old) =>
+        old.map((r, i) => (i === index ? { ...r, status: "uspešno", error: undefined } : r)),
+      );
+    } catch (e) {
+      setRows((old) =>
+        old.map((r, i) =>
+          i === index
+            ? { ...r, status: "neuspešno", error: e instanceof Error ? e.message : "Greška" }
+            : r,
+        ),
+      );
+    }
+  }
+  async function start(retry = false) {
+    if (rows.some((r) => !r.slug)) return;
+    setRunning(true);
+    const queue = rows
+      .map((r, i) => ({ r, i }))
+      .filter(({ r }) => (retry ? r.status === "neuspešno" : r.status === "spremno"));
+    let cursor = 0;
+    await Promise.all(
+      Array.from({ length: Math.min(3, queue.length) }, async () => {
+        while (cursor < queue.length) {
+          const current = queue[cursor++];
+          await uploadOne(current.i);
+        }
+      }),
+    );
+    setRunning(false);
+    onDone();
+  }
+  const counts = {
+    success: rows.filter((r) => r.status === "uspešno").length,
+    failed: rows.filter((r) => r.status === "neuspešno").length,
+    skipped: rows.filter((r) => r.status === "preskočeno").length,
+  };
+  return (
+    <section className="mt-6 rounded-2xl bg-white p-6">
+      <h2 className="text-xl font-semibold">Masovni import kataloga</h2>
+      <input
+        className="mt-4"
+        type="file"
+        multiple
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        onChange={(e) => choose(e.target.files)}
+      />
+      {rows.length > 0 && (
+        <>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr>
+                  <th>Fajl</th>
+                  <th>Detektovan apartman</th>
+                  <th>Placement</th>
+                  <th>Cover</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, i) => (
+                  <tr key={`${row.file.name}-${i}`}>
+                    <td>{row.file.name}</td>
+                    <td>
+                      {row.slug ? (
+                        apartments.find((a) => a.slug === row.slug)?.code
+                      ) : (
+                        <select
+                          aria-label={`Apartman za ${row.file.name}`}
+                          value=""
+                          onChange={(e) =>
+                            setRows((old) =>
+                              old.map((r, x) => (x === i ? { ...r, slug: e.target.value } : r)),
+                            )
+                          }
+                        >
+                          <option value="">Nije moguće pouzdano odrediti apartman.</option>
+                          {apartments.map((a) => (
+                            <option key={a.id} value={a.slug}>
+                              {a.code} – {a.floor}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </td>
+                    <td>
+                      {row.placement === "APARTMENT_CATALOG" ? "Kataloška strana" : row.placement}
+                    </td>
+                    <td>{row.cover ? "Da" : "Ne"}</td>
+                    <td>
+                      {row.status}
+                      {row.error ? `: ${row.error}` : ""}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 flex gap-3">
+            <button
+              disabled={running || rows.some((r) => !r.slug)}
+              onClick={() => void start()}
+              className="rounded-xl bg-forest-900 px-4 py-2 text-white disabled:opacity-50"
+            >
+              {running ? "Upload u toku..." : "Pokreni upload"}
+            </button>
+            {counts.failed > 0 && (
+              <button disabled={running} onClick={() => void start(true)}>
+                Ponovi neuspešne
+              </button>
+            )}
+          </div>
+          <p className="mt-3">
+            Uspešno: {counts.success} · Neuspešno: {counts.failed} · Preskočeno: {counts.skipped}
+          </p>
+        </>
+      )}
+    </section>
+  );
+}

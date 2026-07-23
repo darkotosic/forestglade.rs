@@ -1,4 +1,139 @@
-"use client";import Image from"next/image";import{useCallback,useEffect,useState}from"react";import{AdminShell}from"@/components/admin/admin-shell";import{BulkCatalogImporter}from"@/components/admin/bulk-catalog-importer";import{adminFetch}from"@/lib/admin-api";import type{MediaAssetDto}from"@/lib/types";
-type Option={id:string;code:string;slug:string;floor:string};const placements=["","HOME_HERO","PROJECT_GALLERY","APARTMENT_GALLERY","APARTMENT_CATALOG","APARTMENT_PLAN","FLOOR_PLAN","EXTERIOR","INTERIOR","VIRTUAL_TOUR","DOCUMENTATION"];
-export default function Page(){const[media,setMedia]=useState<MediaAssetDto[]>([]);const[apartments,setApartments]=useState<Option[]>([]);const[filters,setFilters]=useState({apartmentSlug:"",placement:"",type:"",published:"",q:""});const[offset,setOffset]=useState(0);const[hasMore,setHasMore]=useState(false);const[error,setError]=useState("");const load=useCallback(async(reset=true)=>{try{const start=reset?0:offset;const params=new URLSearchParams({...filters,offset:String(start),limit:"100"});for(const[k,v]of [...params])if(!v)params.delete(k);const d=await adminFetch<{media:MediaAssetDto[];hasMore:boolean}>(`/media?${params}`);setMedia(old=>reset?d.media:[...old,...d.media]);setOffset(start+d.media.length);setHasMore(d.hasMore)}catch(e){setError(e instanceof Error?e.message:"Slike trenutno nije moguće učitati. Pokušajte ponovo.")}},[filters,offset]);useEffect(()=>{adminFetch<{apartments:Option[]}>("/apartments/options").then(d=>setApartments(d.apartments));void Promise.resolve().then(()=>load(true))// eslint-disable-next-line react-hooks/exhaustive-deps
-},[]);return <AdminShell><h1 className="text-3xl font-semibold">Media biblioteka</h1><BulkCatalogImporter apartments={apartments} onDone={()=>void load(true)}/><section className="mt-6 grid gap-3 rounded-2xl bg-white p-6 md:grid-cols-5"><select value={filters.apartmentSlug} onChange={e=>setFilters({...filters,apartmentSlug:e.target.value})}><option value="">Svi apartmani</option>{apartments.map(a=><option key={a.id} value={a.slug}>{a.code} – {a.floor}</option>)}</select><select value={filters.placement} onChange={e=>setFilters({...filters,placement:e.target.value})}>{placements.map(p=><option key={p} value={p}>{p||"Svi placement-i"}</option>)}</select><select value={filters.type} onChange={e=>setFilters({...filters,type:e.target.value})}><option value="">Svi tipovi</option>{["IMAGE","RENDER","FLOOR_PLAN","VIDEO","DOCUMENT","VIRTUAL_TOUR"].map(x=><option key={x}>{x}</option>)}</select><select value={filters.published} onChange={e=>setFilters({...filters,published:e.target.value})}><option value="">Objavljeno i draft</option><option value="true">Objavljeno</option><option value="false">Draft</option></select><input placeholder="Pretraga po naslovu" value={filters.q} onChange={e=>setFilters({...filters,q:e.target.value})}/><button onClick={()=>void load(true)}>Primeni filtere</button></section>{error&&<p className="mt-5 rounded-xl bg-red-50 p-4">{error}</p>}<div className="mt-6 grid gap-4 md:grid-cols-3">{media.map(x=><div className="rounded-2xl bg-white p-3" key={x.id}>{x.thumbnailUrl&&x.type!=="VIDEO"&&x.type!=="DOCUMENT"&&<Image unoptimized src={x.thumbnailUrl} alt={x.alt??x.title} width={600} height={400} className="aspect-[4/3] w-full object-contain"/>}<p>{x.title}</p><p>{x.apartment?.code??"Globalno"} · {x.placement}</p></div>)}</div>{hasMore&&<button className="mt-6" onClick={()=>void load(false)}>Učitaj još</button>}</AdminShell>}
+"use client";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
+import { AdminShell } from "@/components/admin/admin-shell";
+import { BulkCatalogImporter } from "@/components/admin/bulk-catalog-importer";
+import { adminFetch } from "@/lib/admin-api";
+import type { MediaAssetDto } from "@/lib/types";
+type Option = { id: string; code: string; slug: string; floor: string };
+const placements = [
+  "",
+  "HOME_HERO",
+  "PROJECT_GALLERY",
+  "APARTMENT_GALLERY",
+  "APARTMENT_CATALOG",
+  "APARTMENT_PLAN",
+  "FLOOR_PLAN",
+  "EXTERIOR",
+  "INTERIOR",
+  "VIRTUAL_TOUR",
+  "DOCUMENTATION",
+];
+export default function Page() {
+  const [media, setMedia] = useState<MediaAssetDto[]>([]);
+  const [apartments, setApartments] = useState<Option[]>([]);
+  const [filters, setFilters] = useState({
+    apartmentSlug: "",
+    placement: "",
+    type: "",
+    published: "",
+    q: "",
+  });
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [error, setError] = useState("");
+  const load = useCallback(
+    async (reset = true) => {
+      try {
+        const start = reset ? 0 : offset;
+        const params = new URLSearchParams({ ...filters, offset: String(start), limit: "100" });
+        for (const [k, v] of [...params]) if (!v) params.delete(k);
+        const d = await adminFetch<{ media: MediaAssetDto[]; hasMore: boolean }>(
+          `/media?${params}`,
+        );
+        setMedia((old) => (reset ? d.media : [...old, ...d.media]));
+        setOffset(start + d.media.length);
+        setHasMore(d.hasMore);
+      } catch (e) {
+        setError(
+          e instanceof Error ? e.message : "Slike trenutno nije moguće učitati. Pokušajte ponovo.",
+        );
+      }
+    },
+    [filters, offset],
+  );
+  useEffect(() => {
+    adminFetch<{ apartments: Option[] }>("/apartments/options").then((d) =>
+      setApartments(d.apartments),
+    );
+    void Promise.resolve().then(() => load(true)); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <AdminShell>
+      <h1 className="text-3xl font-semibold">Media biblioteka</h1>
+      <BulkCatalogImporter apartments={apartments} onDone={() => void load(true)} />
+      <section className="mt-6 grid gap-3 rounded-2xl bg-white p-6 md:grid-cols-5">
+        <select
+          value={filters.apartmentSlug}
+          onChange={(e) => setFilters({ ...filters, apartmentSlug: e.target.value })}
+        >
+          <option value="">Svi apartmani</option>
+          {apartments.map((a) => (
+            <option key={a.id} value={a.slug}>
+              {a.code} – {a.floor}
+            </option>
+          ))}
+        </select>
+        <select
+          value={filters.placement}
+          onChange={(e) => setFilters({ ...filters, placement: e.target.value })}
+        >
+          {placements.map((p) => (
+            <option key={p} value={p}>
+              {p || "Svi placement-i"}
+            </option>
+          ))}
+        </select>
+        <select
+          value={filters.type}
+          onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+        >
+          <option value="">Svi tipovi</option>
+          {["IMAGE", "RENDER", "FLOOR_PLAN", "VIDEO", "DOCUMENT", "VIRTUAL_TOUR"].map((x) => (
+            <option key={x}>{x}</option>
+          ))}
+        </select>
+        <select
+          value={filters.published}
+          onChange={(e) => setFilters({ ...filters, published: e.target.value })}
+        >
+          <option value="">Objavljeno i draft</option>
+          <option value="true">Objavljeno</option>
+          <option value="false">Draft</option>
+        </select>
+        <input
+          placeholder="Pretraga po naslovu"
+          value={filters.q}
+          onChange={(e) => setFilters({ ...filters, q: e.target.value })}
+        />
+        <button onClick={() => void load(true)}>Primeni filtere</button>
+      </section>
+      {error && <p className="mt-5 rounded-xl bg-red-50 p-4">{error}</p>}
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        {media.map((x) => (
+          <div className="rounded-2xl bg-white p-3" key={x.id}>
+            {x.thumbnailUrl && x.type !== "VIDEO" && x.type !== "DOCUMENT" && (
+              <Image
+                unoptimized
+                src={x.thumbnailUrl}
+                alt={x.alt ?? x.title}
+                width={600}
+                height={400}
+                className="aspect-[4/3] w-full object-contain"
+              />
+            )}
+            <p>{x.title}</p>
+            <p>
+              {x.apartment?.code ?? "Globalno"} · {x.placement}
+            </p>
+          </div>
+        ))}
+      </div>
+      {hasMore && (
+        <button className="mt-6" onClick={() => void load(false)}>
+          Učitaj još
+        </button>
+      )}
+    </AdminShell>
+  );
+}
