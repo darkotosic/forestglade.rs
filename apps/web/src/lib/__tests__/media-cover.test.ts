@@ -7,18 +7,25 @@ const item = (
   placement: MediaAssetDto["placement"],
   isCover = false,
   isPublished = true,
-) => ({
+): MediaAssetDto => ({
   id,
   title: id,
   alt: id,
   caption: null,
   secureUrl: id,
   thumbnailUrl: null,
+  originalFilename: `${id}.jpg`,
+  cloudinaryResourceType: "image",
   placement,
   type: "IMAGE" as const,
   isPublished,
   isCover,
   sortOrder: 0,
+  format: "jpg",
+  width: 1200,
+  height: 800,
+  durationSeconds: null,
+  bytes: 2048,
 });
 test("cover priority", () => {
   assert.equal(

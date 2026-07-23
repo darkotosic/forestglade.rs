@@ -91,19 +91,38 @@ npm run build
 
 ## Docker
 
-Build the production API image:
+Build the production API image from a clean checkout after the quality gate passes:
 
 ```bash
-docker build -t forestglade-api .
+npm ci
+npm run check
+docker build --build-arg VCS_REF=$(git rev-parse --short HEAD) -t forestglade-api .
 ```
 
-Smoke-test the runtime image:
+Smoke-test the runtime image by starting the API with non-secret test values, waiting for `/health`, and then stopping the container with SIGTERM:
 
 ```bash
-docker run --rm forestglade-api node --version
+docker run --name forestglade-api-smoke -d \
+  -e NODE_ENV=production \
+  -e PORT=10000 \
+  -e DATABASE_URL=postgresql://user:pass@localhost:5432/forestglade \
+  -e CORS_ORIGIN=http://localhost:3000 \
+  -e ADMIN_BOOTSTRAP_TOKEN=test-bootstrap-token \
+  -e SESSION_COOKIE_NAME=fg_admin_session \
+  -e SESSION_DAYS=7 \
+  -e CLOUDINARY_CLOUD_NAME=test \
+  -e CLOUDINARY_API_KEY=test \
+  -e CLOUDINARY_API_SECRET=test \
+  -e CLOUDINARY_FOLDER=forestglade-test \
+  -p 10000:10000 \
+  forestglade-api
+curl --fail http://127.0.0.1:10000/health
+docker stop --time 15 forestglade-api-smoke
+docker inspect forestglade-api-smoke --format='{{.State.ExitCode}}'
+docker rm forestglade-api-smoke
 ```
 
-The Dockerfile uses a multi-stage build, installs production dependencies separately, runs as a non-root user, exposes the API, and includes a `/health` healthcheck. Migrations and official seed are intentionally separate release commands.
+The Dockerfile uses a multi-stage build, installs production dependencies separately, copies only runtime package metadata, root production `node_modules`, API build output, Prisma files, and built project data, runs as a non-root user, exposes the API, includes OCI labels, and includes a `/health` healthcheck. Migrations and official seed are intentionally separate release commands.
 
 ## Render deploy
 

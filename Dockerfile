@@ -28,9 +28,11 @@ RUN npm run build:project-data
 RUN npm --workspace apps/api run build
 
 FROM base AS runtime
+ARG VCS_REF=unknown
+LABEL org.opencontainers.image.title="Forest Glade API" \
+  org.opencontainers.image.source="https://github.com/forestglade/forestglade.rs" \
+  org.opencontainers.image.revision=$VCS_REF
 COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=prod-deps /app/apps/api/node_modules ./apps/api/node_modules
-COPY --from=prod-deps /app/packages/project-data/node_modules ./packages/project-data/node_modules
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder /app/packages/project-data/dist ./packages/project-data/dist
