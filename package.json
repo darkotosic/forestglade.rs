@@ -27,6 +27,7 @@
     "test": "npm run test:web && npm run test:api",
     "build": "npm run build:project-data && npm run build:api && npm run build:web",
     "check": "npm run format:check && npm run prisma:validate && npm run build:project-data && npm run typecheck:api && npm run typecheck:web && npm run lint:web && npm run test && npm run build:api && npm run build:web",
+    "check:fast": "npm run format:check && npm run prisma:validate && npm run typecheck && npm run test",
     "verify:repository": "node scripts/verify-repository.mjs"
   },
   "devDependencies": {
