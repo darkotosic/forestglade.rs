@@ -1,10 +1,11 @@
 import { OFFICIAL_PROJECT_FACTS } from "@forestglade/project-data";
+import { canonicalSiteUrl } from "@/lib/seo";
 
 export const site = {
   name: OFFICIAL_PROJECT_FACTS.companyName,
   title: OFFICIAL_PROJECT_FACTS.project,
   description: "Premium apartmani u Vrdniku, na obroncima Fruške Gore.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://forestglade.rs",
+  url: canonicalSiteUrl(),
   email: "info@forestglade.rs",
   phone: "POTREBNA PROVERA",
   location: OFFICIAL_PROJECT_FACTS.location,
