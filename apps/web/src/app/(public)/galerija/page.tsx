@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo";
 import { GalleryLiveMedia } from "@/components/public/public-live";
 import { ContactCta } from "@/components/site-shell";
-export const metadata: Metadata = {
-  title: "Galerija | Forest Glade",
-  description: "Galerija projekta Forest Glade.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Galerija Forest Glade Apart Hotela",
+  description:
+    "Pogledajte eksterijer, enterijer i objavljene materijale projekta Forest Glade Apart Hotel u Vrdniku.",
+  path: "/galerija",
+});
 export default function Page() {
   return (
     <main>

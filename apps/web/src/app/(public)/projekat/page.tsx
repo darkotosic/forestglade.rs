@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo";
 import { ContactCta } from "@/components/site-shell";
 import { MATERIALIZATION_FACTS, OFFICIAL_PROJECT_FACTS } from "@forestglade/project-data";
-export const metadata: Metadata = {
-  title: "Projekat | Forest Glade",
-  description: "Zvanični podaci za Forest Glade Apart Hotel u Vrdniku.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Forest Glade Apart Hotel | Projekat u Vrdniku",
+  description:
+    "Zvanični podaci o projektu Forest Glade Apart Hotel u Vrdniku: 31 apartman, površine, parking i materijalizacija.",
+  path: "/projekat",
+});
 export default function Page() {
   const facts = [
     ["Naziv", OFFICIAL_PROJECT_FACTS.project],

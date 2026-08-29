@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   ArrowRight,
   Building2,
@@ -13,7 +14,15 @@ import { SectionHeading } from "@/components/section-heading";
 import { ContactCta } from "@/components/site-shell";
 import { StatCard } from "@/components/stat-card";
 import { AnimatedNumber } from "@/components/animated-number";
-import { projectFacts, site } from "@/lib/site";
+import { projectFacts } from "@/lib/site";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Forest Glade Apart Hotel | Premium apartmani u Vrdniku",
+  description:
+    "Forest Glade Apart Hotel u Vrdniku: 31 premium apartman na obroncima Fruške Gore. Pogledajte projekat, apartmane i zvanične podatke.",
+  path: "/",
+});
 
 const stats = [
   [projectFacts.totalApartments, "apartman"],
@@ -45,20 +54,8 @@ const journey = [
 ];
 
 export default function Home() {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "RealEstateAgent",
-    name: site.name,
-    url: site.url,
-    email: site.email,
-    address: site.location,
-  };
   return (
     <main>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
       <section className="relative isolate overflow-hidden bg-forest-950 text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(201,162,39,.32),transparent_28%),radial-gradient(circle_at_78%_10%,rgba(219,229,225,.16),transparent_24%),linear-gradient(135deg,rgba(0,43,38,.9),rgba(0,60,53,.94)),url('/renders/hero-placeholder.svg')] bg-cover bg-center" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-forest-950 to-transparent" />

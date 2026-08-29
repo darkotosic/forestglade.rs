@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next";
+import type { Metadata, MetadataRoute } from "next";
 
 const DEFAULT_SITE_URL = "https://forestglade.rs";
 
@@ -31,4 +31,37 @@ export function canonicalSiteUrl(configuredUrl = process.env.NEXT_PUBLIC_SITE_UR
 
 export function absoluteUrl(path: `/${string}`, origin = canonicalSiteUrl()): string {
   return path === "/" ? origin : `${origin}${path}`;
+}
+
+type PageMetadata = {
+  title: string;
+  description: string;
+  path: `/${string}`;
+};
+
+/** Builds consistent, self-canonical metadata for every indexable public page. */
+export function createPageMetadata({ title, description, path }: PageMetadata): Metadata {
+  const url = absoluteUrl(path);
+
+  return {
+    title: { absolute: title },
+    description,
+    alternates: {
+      canonical: url,
+      languages: { "sr-RS": url, "x-default": url },
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "Forest Glade",
+      locale: "sr_RS",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
 }

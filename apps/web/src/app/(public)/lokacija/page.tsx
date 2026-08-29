@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo";
 import { ContactCta } from "@/components/site-shell";
 import { OFFICIAL_PROJECT_FACTS } from "@forestglade/project-data";
-export const metadata: Metadata = {
-  title: "Lokacija | Forest Glade",
-  description: "Lokacija Forest Glade Apart Hotela: Velika Međa bb, Vrdnik.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Lokacija Forest Glade | Vrdnik",
+  description:
+    "Forest Glade Apart Hotel nalazi se na adresi Velika Međa bb u Vrdniku, na Fruškoj gori.",
+  path: "/lokacija",
+});
 export default function Page() {
   return (
     <main>

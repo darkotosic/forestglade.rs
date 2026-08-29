@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo";
 import { PublicApartmentList } from "@/components/public/public-apartment-list";
 import { apartments } from "@/data/apartments";
 
-export const metadata: Metadata = {
-  title: "Apartmani",
-  description: "Lista svih 31 apartmana Forest Glade apart-hotela u Vrdniku.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Apartmani Forest Glade u Vrdniku",
+  description:
+    "Pregled svih 31 apartmana Forest Glade Apart Hotela u Vrdniku, sa površinama, spratovima i aktuelnom dostupnošću.",
+  path: "/apartmani",
+});
 
 export default function ApartmentsPage() {
   const floors = [...new Set(apartments.map((a) => a.floor))];
