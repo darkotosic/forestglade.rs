@@ -4,6 +4,7 @@ import { ContactCta } from "@/components/site-shell";
 import { PublicApartmentStatus } from "@/components/public/public-live";
 import { ApartmentGallery } from "@/components/public/apartment-gallery";
 import { apartments, getApartment } from "@/data/apartments";
+import { createPageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   return apartments.map((apartment) => ({ slug: apartment.slug }));
@@ -16,12 +17,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const apartment = getApartment(slug);
-  return {
-    title: apartment ? `Apartman ${apartment.code}` : "Apartman",
-    description: apartment
-      ? `${apartment.code}, ${apartment.floor}, Forest Glade Vrdnik.`
-      : undefined,
-  };
+  if (!apartment) {
+    return { title: "Apartman nije pronađen", robots: { index: false, follow: false } };
+  }
+
+  return createPageMetadata({
+    title: `Apartman ${apartment.code} | Forest Glade Vrdnik`,
+    description: `Apartman ${apartment.code}, ${apartment.floor}, površine ${apartment.marketArea.toFixed(2)} m² u Forest Glade Apart Hotelu u Vrdniku.`,
+    path: `/apartmani/${apartment.slug}`,
+  });
 }
 
 export default async function ApartmentDetail({ params }: { params: Promise<{ slug: string }> }) {

@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { ProjectCard } from "@/components/project-card";
 import { SectionHeading } from "@/components/section-heading";
 import { projectFacts } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Projekti",
-  description: "Forest Glade projekti, sa fokusom na Forest Glade Apart Hotel u Vrdniku.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Projekti Forest Glade",
+  description:
+    "Forest Glade razvojni portfolio sa fokusom na premium Forest Glade Apart Hotel u Vrdniku.",
+  path: "/projekti",
+});
 
 export default function ProjektiPage() {
   const details = [

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo";
 import { OFFICIAL_APARTMENTS } from "@forestglade/project-data";
-export const metadata: Metadata = {
-  title: "Virtuelne šetnje | Forest Glade",
-  description: "Status virtuelnih šetnji po apartmanima.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Virtuelne šetnje | Forest Glade apartmani",
+  description:
+    "Virtuelne šetnje i pregled apartmana A1–A31 u projektu Forest Glade Apart Hotel u Vrdniku.",
+  path: "/virtuelne-setnje",
+});
 export default function Page() {
   return (
     <main>

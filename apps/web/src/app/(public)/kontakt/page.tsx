@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
 import { SectionHeading } from "@/components/section-heading";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Kontakt",
-  description: "Kontaktirajte Forest Glade prodajni tim za prezentaciju i dostupnost apartmana.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Kontakt Forest Glade",
+  description:
+    "Kontaktirajte Forest Glade prodajni tim za prezentaciju projekta i proveru dostupnosti apartmana u Vrdniku.",
+  path: "/kontakt",
+});
 
 export default function KontaktPage() {
   return (

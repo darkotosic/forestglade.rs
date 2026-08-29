@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/seo";
 import { SectionHeading } from "@/components/section-heading";
 
-export const metadata: Metadata = {
-  title: "O nama",
-  description: "Forest Glade d.o.o — savremeni rezidencijalni i apart-hotel razvoj.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "O nama | Forest Glade d.o.o",
+  description:
+    "Upoznajte Forest Glade d.o.o, investitora fokusiranog na kvalitetan rezidencijalni i apart-hotel razvoj.",
+  path: "/o-nama",
+});
 const values = ["Preciznost", "Kvalitet", "Dugoročna vrednost"];
 const materials = [
   "ravne linije i kubusi",
