@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Forest Glade</title>
+  <rect width="64" height="64" rx="14" fill="#002b26" />
+  <path
+    d="M32 9 17 28h9L14 43h14v12h8V43h14L38 28h9L32 9Z"
+    fill="#c9a227"
+  />
+  <path d="M32 9v46" fill="none" stroke="#f7f1e5" stroke-width="3" />
+</svg>
