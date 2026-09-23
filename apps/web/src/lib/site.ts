@@ -7,7 +7,8 @@ export const site = {
   description: "Premium apartmani u Vrdniku, na obroncima Fruške Gore.",
   url: canonicalSiteUrl(),
   email: "info@forestglade.rs",
-  phone: "POTREBNA PROVERA",
+  phone: "0658441634",
+  phoneHref: "tel:0658441634",
   location: OFFICIAL_PROJECT_FACTS.location,
 };
 
