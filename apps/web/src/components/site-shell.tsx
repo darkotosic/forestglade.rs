@@ -49,7 +49,13 @@ export function Footer() {
             Forest Glade d.o.o razvija savremeni apart-hotel koncept u Vrdniku, sa fokusom na
             kvalitet gradnje, funkcionalne apartmane i poverenje kupaca.
           </p>
-          <p className="mt-4 text-sm text-mist-300">Zvaničan telefon: POTREBNA PROVERA.</p>
+          <p className="mt-4 text-sm text-mist-300">
+            Zvaničan telefon:{" "}
+            <a className="transition hover:text-gold-300" href={site.phoneHref}>
+              {site.phone}
+            </a>
+            .
+          </p>
         </div>
         <div>
           <p className="font-semibold text-white">Linkovi</p>
@@ -70,15 +76,12 @@ export function Footer() {
             <p className="flex gap-3">
               <MapPin size={18} className="text-gold-300" /> {site.location}
             </p>
-            {site.phone !== "POTREBNA PROVERA" ? (
-              <p className="flex gap-3">
-                <Phone size={18} className="text-gold-300" /> Telefon: {site.phone}
-              </p>
-            ) : (
-              <p className="flex gap-3">
-                <Phone size={18} className="text-gold-300" /> Telefon: POTREBNA PROVERA
-              </p>
-            )}
+            <p className="flex gap-3">
+              <Phone size={18} className="text-gold-300" />
+              <a className="transition hover:text-gold-300" href={site.phoneHref}>
+                Telefon: {site.phone}
+              </a>
+            </p>
           </div>
         </div>
       </div>

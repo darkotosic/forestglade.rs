@@ -35,7 +35,12 @@ export default function KontaktPage() {
           <div className="rounded-[2rem] bg-white p-7 shadow-sm">
             <Phone className="text-gold-500" />
             <h2 className="mt-4 text-2xl font-semibold">Telefon</h2>
-            <p className="mt-2 text-stone-600">Telefon: {site.phone}</p>
+            <a
+              className="mt-2 inline-block text-stone-600 transition hover:text-forest-800"
+              href={site.phoneHref}
+            >
+              Telefon: {site.phone}
+            </a>
           </div>
           <div className="rounded-[2rem] bg-white p-7 shadow-sm">
             <MapPin className="text-gold-500" />
